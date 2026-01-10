@@ -9,7 +9,6 @@ namespace GatewayIDE.App.Services.Auth;
 
 /// <summary>
 /// UI-neutrales Bootstrap für GitHub Device Flow + WireGuard-Key-Erzeugung.
-/// Kein Avalonia, keine Window-Abhängigkeiten.
 /// </summary>
 public sealed class AuthBootstrapService
 {
