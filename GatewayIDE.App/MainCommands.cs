@@ -38,10 +38,6 @@ public sealed class MainCommands
     {
         _vm = vm;
 
-        // Layout
-        ExpandGatewayOnlyCommand =
-            new DelegateCommand(_ => vm.Layout.ToggleExpandGatewayOnly());
-
         // Sidebar / Chat
         ToggleChatCommand =
             new DelegateCommand(_ => vm.Chat.ToggleChatSidebar());
