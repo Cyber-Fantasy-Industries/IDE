@@ -1,0 +1,113 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="GatewayIDE.App.Views.LeftRail">
+
+  <Grid Width="56"
+        Background="#2a2e35">
+
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+    <!-- ========================= -->
+    <!-- TOP GROUP                -->
+    <!-- ========================= -->
+    <StackPanel Grid.Row="0"
+                Margin="0,6"
+                Spacing="4">
+
+      <!-- Dashboard -->
+      <Button Classes="rail"
+              ToolTip.Tip="Dashboard"
+              Command="{Binding Commands.SelectTabCommand}"
+              CommandParameter="Dashboard">
+        <TextBlock Text="📊" FontSize="18"/>
+      </Button>
+
+    </StackPanel>
+
+    <!-- ========================= -->
+    <!-- CENTER GROUP             -->
+    <!-- ========================= -->
+    <StackPanel Grid.Row="1"
+                Margin="0,6"
+                Spacing="4">
+
+      <!-- Explorer -->
+      <Button Classes="rail"
+              ToolTip.Tip="Explorer"
+              Command="{Binding Commands.SelectTabCommand}"
+              CommandParameter="Explorer">
+        <TextBlock Text="🧭" FontSize="18"/>
+      </Button>
+
+      <!-- Engines -->
+      <Button Classes="rail"
+              ToolTip.Tip="Engines"
+              Command="{Binding Commands.SelectTabCommand}"
+              CommandParameter="Engines">
+        <TextBlock Text="⚙" FontSize="18"/>
+      </Button>
+
+      <!-- GitHub -->
+      <Button Classes="rail"
+              ToolTip.Tip="GitHub"
+              Command="{Binding Commands.SelectTabCommand}"
+              CommandParameter="GitHub">
+        <TextBlock Text="" FontSize="18"/>
+      </Button>
+
+      <!-- Docker -->
+      <Button Classes="rail"
+              ToolTip.Tip="Docker"
+              Command="{Binding Commands.SelectTabCommand}"
+              CommandParameter="Docker">
+        <TextBlock Text="🐳" FontSize="18"/>
+      </Button>
+
+      <!-- KI System -->
+      <Button Classes="rail"
+              ToolTip.Tip="KI System"
+              Command="{Binding Commands.SelectTabCommand}"
+              CommandParameter="KI System">
+        <TextBlock Text="🤖" FontSize="18"/>
+      </Button>
+
+      <!-- Network -->
+      <Button Classes="rail"
+              ToolTip.Tip="Network"
+              Command="{Binding Commands.SelectTabCommand}"
+              CommandParameter="Network">
+        <TextBlock Text="🌐" FontSize="18"/>
+      </Button>
+
+    </StackPanel>
+
+    <!-- ========================= -->
+    <!-- BOTTOM GROUP             -->
+    <!-- ========================= -->
+    <StackPanel Grid.Row="2"
+                Margin="0,6"
+                Spacing="4">
+
+      <!-- Settings -->
+      <Button Classes="rail"
+              ToolTip.Tip="Settings"
+              Command="{Binding Commands.SelectTabCommand}"
+              CommandParameter="Settings">
+        <TextBlock Text="⚙️" FontSize="18"/>
+      </Button>
+
+      <!-- Chat Toggle -->
+      <Button Classes="rail"
+              ToolTip.Tip="Chat"
+              Command="{Binding Commands.ToggleChatCommand}">
+        <TextBlock Text="💬" FontSize="18"/>
+      </Button>
+
+    </StackPanel>
+
+  </Grid>
+</UserControl>

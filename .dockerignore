@@ -1,0 +1,25 @@
+# VCS / IDE
+.git
+.vscode
+.vs
+
+# Python/uv caches
+__pycache__
+*.pyc
+.venv
+.uv_cache
+.pytest_cache
+.mypy_cache
+.coverage
+
+# Logs & runtime artifacts
+logs
+**/logs
+*.log
+
+# Secrets / local env (Compose lädt env_file direkt)
+.env
+dev.env
+net.dev.env
+net.prod.env
+

@@ -1,0 +1,16 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="GatewayIDE.App.Views.GitHub.GitHubPanel">
+
+  <Border Background="#121212" Padding="16">
+    <StackPanel Spacing="12">
+      <TextBlock Text="GITHUB" Foreground="#eaeaea" FontSize="18"/>
+
+      <Button Content="Login mit GitHub"
+              Click="LoginButton_Click"
+              HorizontalAlignment="Left"
+              Margin="0,0,0,8"/>
+    </StackPanel>
+  </Border>
+
+</UserControl>

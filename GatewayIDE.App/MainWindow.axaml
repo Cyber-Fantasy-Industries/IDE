@@ -1,0 +1,133 @@
+<!-- MainWindow.axaml -->
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="clr-namespace:GatewayIDE.App.Views"
+        x:Class="GatewayIDE.App.MainWindow"
+        Title="IDE"
+        Width="1280"
+        Height="800"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="PreferSystemChrome"
+        ExtendClientAreaTitleBarHeightHint="30">
+
+  <!-- ========================= -->
+  <!-- STYLES                    -->
+  <!-- ========================= -->
+  <Window.Styles>
+
+    <!-- Rail Buttons -->
+    <Style Selector="Button.rail">
+      <Setter Property="Width" Value="56"/>
+      <Setter Property="Height" Value="44"/>
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Opacity" Value="0.88"/>
+    </Style>
+
+    <Style Selector="Button.rail:pointerover">
+      <Setter Property="Opacity" Value="1"/>
+      <Setter Property="Background" Value="#32363d"/>
+    </Style>
+
+    <Style Selector="Button.rail:pressed">
+      <Setter Property="Background" Value="#3a3f46"/>
+    </Style>
+
+    <Style Selector="ToggleButton.rail:checked">
+      <Setter Property="Background" Value="#3d4450"/>
+      <Setter Property="Opacity" Value="1"/>
+    </Style>
+
+    <!-- Menu Styling -->
+    <Style Selector="Menu">
+      <Setter Property="Background" Value="#2b2f36"/>
+      <Setter Property="Foreground" Value="#ddd"/>
+    </Style>
+
+    <Style Selector="MenuItem">
+      <Setter Property="Foreground" Value="#ddd"/>
+    </Style>
+
+    <Style Selector="MenuItem:pointerover">
+      <Setter Property="Background" Value="#3a3f46"/>
+    </Style>
+
+  </Window.Styles>
+
+  <!-- ========================= -->
+  <!-- ROOT LAYOUT               -->
+  <!-- ========================= -->
+  <Grid RowDefinitions="Auto,*">
+
+    <!-- ========================= -->
+    <!-- HEADER / TITLE BAR        -->
+    <!-- ========================= -->
+    <Border Grid.Row="0"
+            Background="#2b2f36"
+            Height="30">
+
+      <Grid ColumnDefinitions="*,Auto">
+
+        <!-- DRAG ZONE + MENU -->
+        <Border Grid.Column="0"
+                Background="Transparent"
+                PointerPressed="TitleDragZone_PointerPressed">
+
+          <!-- echtes Dropdown-Menü -->
+          <Menu Background="Transparent">
+            <MenuItem Header="_File">
+              <MenuItem Header="DropdownOptionA1"
+                        Command="{Binding Commands.MenuActionCommand}"
+                        CommandParameter="file:a1"/>
+              <MenuItem Header="DropdownOptionA2"
+                        Command="{Binding Commands.MenuActionCommand}"
+                        CommandParameter="file:a2"/>
+              <MenuItem Header="DropdownOptionA3"
+                        Command="{Binding Commands.MenuActionCommand}"
+                        CommandParameter="file:a3"/>
+            </MenuItem>
+
+            <MenuItem Header="_Edit">
+              <MenuItem Header="DropdownOptionB1"
+                        Command="{Binding Commands.MenuActionCommand}"
+                        CommandParameter="edit:b1"/>
+              <MenuItem Header="DropdownOptionB2"
+                        Command="{Binding Commands.MenuActionCommand}"
+                        CommandParameter="edit:b2"/>
+              <MenuItem Header="DropdownOptionB3"
+                        Command="{Binding Commands.MenuActionCommand}"
+                        CommandParameter="edit:b3"/>
+            </MenuItem>
+
+            <MenuItem Header="_Selection">
+              <MenuItem Header="DropdownOptionC1"
+                        Command="{Binding Commands.MenuActionCommand}"
+                        CommandParameter="selection:c1"/>
+              <MenuItem Header="DropdownOptionC2"
+                        Command="{Binding Commands.MenuActionCommand}"
+                        CommandParameter="selection:c2"/>
+              <MenuItem Header="DropdownOptionC3"
+                        Command="{Binding Commands.MenuActionCommand}"
+                        CommandParameter="selection:c3"/>
+            </MenuItem>
+
+          </Menu>
+        </Border>
+
+        <!-- Platz für native Window Buttons -->
+        <Border Grid.Column="1"
+                Width="180"
+                Background="Transparent"/>
+      </Grid>
+    </Border>
+
+    <!-- ========================= -->
+    <!-- BODY                      -->
+    <!-- ========================= -->
+    <views:MainLayout Grid.Row="1"/>
+
+  </Grid>
+</Window>

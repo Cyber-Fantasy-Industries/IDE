@@ -1,0 +1,299 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="GatewayIDE.App.Views.Network.NetworkPanel">
+
+  <Grid RowDefinitions="Auto,Auto,*,Auto"
+        Background="#0f0f0f">
+
+    <!-- ========================= -->
+    <!-- TOP: CONNECT + HOST        -->
+    <!-- ========================= -->
+    <Grid Grid.Row="0"
+          ColumnDefinitions="*,*"
+          Margin="16,16,16,0">
+
+      <!-- CONNECT (left) -->
+      <Border Grid.Column="0"
+              Margin="0,0,8,0"
+              Background="#1b1e23"
+              CornerRadius="10"
+              Padding="16">
+        <StackPanel Spacing="12">
+
+          <TextBlock Text="Connect to Network"
+                     FontSize="18"
+                     FontWeight="Bold"/>
+
+          <TextBlock Text="Paste invite code or network address."
+                     Opacity="0.75"/>
+
+          <TextBox Watermark="Invite Code / Address"
+                   Margin="0,4,0,0"/>
+
+          <Grid ColumnDefinitions="*,*">
+            <StackPanel Grid.Column="0" Spacing="6" Margin="0,0,6,0">
+              <TextBlock Text="Username" Opacity="0.75"/>
+              <TextBox Watermark="username"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Spacing="6" Margin="6,0,0,0">
+              <TextBlock Text="Device ID" Opacity="0.75"/>
+              <TextBox Watermark="clientname (devbox-1)"/>
+            </StackPanel>
+          </Grid>
+
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Content="Join"
+                    MinWidth="120"/>
+            <TextBlock Text="Client key is generated automatically after GitHub auth."
+                       Opacity="0.55"
+                       VerticalAlignment="Center"/>
+          </StackPanel>
+
+        </StackPanel>
+      </Border>
+
+      <!-- HOST (right) -->
+      <Border Grid.Column="1"
+              Margin="8,0,0,0"
+              Background="#1b1e23"
+              CornerRadius="10"
+              Padding="16">
+        <StackPanel Spacing="12">
+
+          <TextBlock Text="Host Network"
+                     FontSize="18"
+                     FontWeight="Bold"/>
+
+          <Grid ColumnDefinitions="*,*">
+            <StackPanel Grid.Column="0" Spacing="6" Margin="0,0,6,0">
+              <TextBlock Text="Network Name" Opacity="0.75"/>
+              <TextBox Watermark="networkname"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Spacing="6" Margin="6,0,0,0">
+              <TextBlock Text="Server Endpoint" Opacity="0.75"/>
+              <TextBox Watermark="your.static.ip:51820"/>
+            </StackPanel>
+          </Grid>
+
+          <Grid ColumnDefinitions="*,*">
+            <StackPanel Grid.Column="0" Spacing="6" Margin="0,0,6,0">
+              <TextBlock Text="WG Subnet" Opacity="0.75"/>
+              <TextBox Watermark="10.77.0.0/16"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Spacing="6" Margin="6,0,0,0">
+              <TextBlock Text="Server IP" Opacity="0.75"/>
+              <TextBox Watermark="10.77.0.10"/>
+            </StackPanel>
+          </Grid>
+
+          <Grid ColumnDefinitions="*,*">
+            <StackPanel Grid.Column="0" Spacing="6" Margin="0,0,6,0">
+              <TextBlock Text="DNS (optional)" Opacity="0.75"/>
+              <TextBox Watermark="1.1.1.1"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Spacing="6" Margin="6,0,0,0">
+              <TextBlock Text="ENV Settings" Opacity="0.75"/>
+              <ComboBox SelectedIndex="0">
+                <ComboBoxItem Content="Auto (recommended)"/>
+                <ComboBoxItem Content="Advanced"/>
+              </ComboBox>
+            </StackPanel>
+          </Grid>
+
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Content="Host"
+                    MinWidth="120"/>
+            <Button Content="Preview ENV"
+                    IsEnabled="False"/>
+          </StackPanel>
+
+        </StackPanel>
+      </Border>
+
+    </Grid>
+
+    <!-- ========================= -->
+    <!-- SECTION TITLES             -->
+    <!-- ========================= -->
+    <Grid Grid.Row="1"
+          ColumnDefinitions="*,*"
+          Margin="16,16,16,0">
+
+      <TextBlock Grid.Column="0"
+                 Text="Connected Networks"
+                 FontSize="16"
+                 FontWeight="Bold"
+                 Margin="8,0,0,0"/>
+
+      <TextBlock Grid.Column="1"
+                 Text="Hosted Networks"
+                 FontSize="16"
+                 FontWeight="Bold"
+                 Margin="8,0,0,0"/>
+    </Grid>
+
+    <!-- ========================= -->
+    <!-- MIDDLE: LISTS              -->
+    <!-- ========================= -->
+    <Grid Grid.Row="2"
+          ColumnDefinitions="*,*"
+          Margin="16,10,16,0">
+
+      <!-- CONNECTED NETWORKS (left) -->
+      <Border Grid.Column="0"
+              Margin="0,0,8,0"
+              Background="#1b1e23"
+              CornerRadius="10"
+              Padding="12">
+
+        <StackPanel Spacing="10">
+
+          <TextBox Watermark="Search connected networks…"/>
+
+          <!-- Placeholder list -->
+          <ItemsControl>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border Background="#252932"
+                        CornerRadius="8"
+                        Padding="10"
+                        Margin="0,6,0,0">
+                  <Grid ColumnDefinitions="*,Auto,Auto,Auto"
+                        RowDefinitions="Auto,Auto">
+                    <!-- name -->
+                    <TextBlock Grid.Row="0" Grid.Column="0"
+                               Text="MyTeamNet"
+                               FontSize="15"
+                               FontWeight="SemiBold"/>
+
+                    <!-- status -->
+                    <TextBlock Grid.Row="0" Grid.Column="1"
+                               Text="● Online"
+                               Foreground="LightGreen"
+                               Margin="12,0,0,0"/>
+
+                    <!-- buttons -->
+                    <Button Grid.Row="0" Grid.Column="2"
+                            Content="Details"
+                            Margin="12,0,0,0"/>
+                    <Button Grid.Row="0" Grid.Column="3"
+                            Content="Disconnect"
+                            Margin="8,0,0,0"/>
+
+                    <!-- small meta row -->
+                    <TextBlock Grid.Row="1" Grid.Column="0"
+                               Text="Last seen: just now • Overlay: 10.77.0.23"
+                               Opacity="0.65"
+                               Margin="0,4,0,0"/>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+
+        </StackPanel>
+
+      </Border>
+
+      <!-- HOSTED NETWORKS (right) -->
+      <Border Grid.Column="1"
+              Margin="8,0,0,0"
+              Background="#1b1e23"
+              CornerRadius="10"
+              Padding="12">
+
+        <StackPanel Spacing="10">
+
+          <TextBox Watermark="Search hosted networks…"/>
+
+          <!-- Placeholder list -->
+          <ItemsControl>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border Background="#252932"
+                        CornerRadius="8"
+                        Padding="10"
+                        Margin="0,6,0,0">
+                  <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto"
+                        RowDefinitions="Auto,Auto">
+
+                    <TextBlock Grid.Row="0" Grid.Column="0"
+                               Text="MyTeamNet"
+                               FontSize="15"
+                               FontWeight="SemiBold"/>
+
+                    <TextBlock Grid.Row="0" Grid.Column="1"
+                               Text="● Online"
+                               Foreground="LightGreen"
+                               Margin="12,0,0,0"/>
+
+                    <Button Grid.Row="0" Grid.Column="2"
+                            Content="Settings"
+                            Margin="12,0,0,0"/>
+
+                    <Button Grid.Row="0" Grid.Column="3"
+                            Content="Create Invite"
+                            Margin="8,0,0,0"/>
+
+                    <Button Grid.Row="0" Grid.Column="4"
+                            Content="View Connections"
+                            Margin="8,0,0,0"/>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0"
+                               Text="Peers: 4 connected • Subnet: 10.77.0.0/16"
+                               Opacity="0.65"
+                               Margin="0,4,0,0"/>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+
+        </StackPanel>
+
+      </Border>
+
+    </Grid>
+
+    <!-- ========================= -->
+    <!-- BOTTOM: VIEWPANEL          -->
+    <!-- ========================= -->
+    <Border Grid.Row="3"
+            Margin="16,16,16,16"
+            Background="#1b1e23"
+            CornerRadius="10"
+            Padding="14">
+
+      <Grid RowDefinitions="Auto,*"
+            ColumnDefinitions="*,Auto">
+
+        <TextBlock Grid.Row="0" Grid.Column="0"
+                   Text="View Panel"
+                   FontSize="16"
+                   FontWeight="Bold"/>
+
+        <Button Grid.Row="0" Grid.Column="1"
+                Content="Clear"
+                IsEnabled="False"/>
+
+        <Border Grid.Row="1" Grid.ColumnSpan="2"
+                Background="#252932"
+                CornerRadius="8"
+                Padding="12"
+                Margin="0,10,0,0">
+          <TextBlock Text="Select a network and click Details / Settings / View Connections to show context here."
+                     Opacity="0.7"
+                     TextWrapping="Wrap"/>
+        </Border>
+
+      </Grid>
+
+    </Border>
+
+  </Grid>
+
+</UserControl>

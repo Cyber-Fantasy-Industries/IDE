@@ -1,0 +1,200 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="GatewayIDE.App.Views.Docker.DockerPanel">
+
+  <!-- Nur anzeigen, wenn Docker-Tab aktiv -->
+  <Grid IsVisible="{Binding Layout.IsDocker}" Margin="8" ClipToBounds="True">
+
+    <!-- Main area: Units (left) + Logs (right) -->
+    <Grid ColumnDefinitions="260,8,*" ClipToBounds="True">
+
+      <!-- Units list -->
+      <Border Grid.Column="0" BorderBrush="#444" BorderThickness="1" Padding="8">
+        <Grid RowDefinitions="Auto,*">
+          <TextBlock Text="Images" FontWeight="SemiBold" Foreground="#d8d8d8" Margin="0,0,0,8"/>
+
+          <ListBox Grid.Row="1"
+                   ItemsSource="{Binding Docker.Units.Units}"
+                   SelectedItem="{Binding Docker.Units.SelectedUnit, Mode=TwoWay}">
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <Border BorderBrush="#333"
+                        BorderThickness="1"
+                        Padding="8"
+                        Margin="0,0,0,6"
+                        Background="#1b1b1b">
+
+                  <Grid RowDefinitions="Auto,Auto,Auto"
+                        ColumnDefinitions="*,Auto">
+
+                    <!-- Name + Status -->
+                    <StackPanel Grid.Row="0" Grid.Column="0">
+                      <TextBlock Text="{Binding DisplayName}"
+                                 FontWeight="SemiBold"
+                                 Foreground="#d8d8d8"/>
+                      <TextBlock Text="{Binding Status}"
+                                 Foreground="{Binding StatusBrush}"
+                                 FontSize="12"/>
+                    </StackPanel>
+
+                    <!-- Tiny status dot -->
+                    <Border Grid.Row="0" Grid.Column="1"
+                            Width="10" Height="10"
+                            CornerRadius="99"
+                            Background="{Binding StatusBrush}"
+                            VerticalAlignment="Center"
+                            Margin="8,0,0,0"/>
+
+                    <!-- Action Buttons row 1 -->
+                    <StackPanel Grid.Row="1" Grid.ColumnSpan="2"
+                                Orientation="Horizontal"
+                                Spacing="6">
+
+                      <Button Content="Open"
+                              MinWidth="54"
+                              Command="{Binding DataContext.Commands.OpenUnitCommand,
+                                                RelativeSource={RelativeSource AncestorType=UserControl}}"
+                              CommandParameter="{Binding}"/>
+
+                      <Button Content="Up"
+                              MinWidth="40"
+                              Command="{Binding DataContext.Commands.StartGatewayCommand,
+                                                RelativeSource={RelativeSource AncestorType=UserControl}}"
+                              CommandParameter="{Binding}"/>
+
+                      <Button Content="Down"
+                              MinWidth="50"
+                              Command="{Binding DataContext.Commands.StopGatewayCommand,
+                                                RelativeSource={RelativeSource AncestorType=UserControl}}"
+                              CommandParameter="{Binding}"/>
+
+                      <Button Content="⟳"
+                              MinWidth="32"
+                              ToolTip.Tip="Restart"
+                              Command="{Binding DataContext.Commands.RestartGatewayCommand,
+                                                RelativeSource={RelativeSource AncestorType=UserControl}}"
+                              CommandParameter="{Binding}"/>
+                    </StackPanel>
+
+                    <!-- Action Buttons row 2 -->
+                    <StackPanel Grid.Row="2" Grid.ColumnSpan="2"
+                                Orientation="Horizontal"
+                                Spacing="6">
+
+                      <Button Content="Rebuild"
+                              MinWidth="70"
+                              Command="{Binding DataContext.Commands.RebuildGatewayCommand,
+                                                RelativeSource={RelativeSource AncestorType=UserControl}}"
+                              CommandParameter="{Binding}"/>
+
+                      <Button Content="Remove"
+                              MinWidth="70"
+                              Command="{Binding DataContext.Commands.RemoveGatewayContainerCommand,
+                                                RelativeSource={RelativeSource AncestorType=UserControl}}"
+                              CommandParameter="{Binding}"/>
+
+                      <Button Content="Clear Logs"
+                              MinWidth="78"
+                              Command="{Binding DataContext.Commands.ClearSelectedLogsCommand,
+                                                RelativeSource={RelativeSource AncestorType=UserControl}}"
+                              CommandParameter="{Binding}"/>
+                    </StackPanel>
+
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </Grid>
+      </Border>
+
+      <!-- spacer -->
+      <Border Grid.Column="1" Background="Transparent"/>
+
+      <!-- RIGHT: 4 windows + input (clean, no titles, no expand) -->
+      <Grid Grid.Column="2"
+            RowDefinitions="120,*,*,Auto"
+            ClipToBounds="True">
+
+        <!-- Row 0: two small panes (Out / Err) -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,8,*" Margin="0,0,0,8" ClipToBounds="True">
+
+          <Border Grid.Column="0" BorderBrush="#444" BorderThickness="1" Padding="8">
+            <TextBox Text="{Binding Docker.Units.SelectedUnit.Logs.DockerOutBuffer}"
+                    CaretIndex="{Binding Docker.Units.SelectedUnit.Logs.DockerOutCaret}"
+                    TextWrapping="Wrap"
+                    FontFamily="Consolas, Menlo, monospace"
+                    IsReadOnly="True"
+                    AcceptsReturn="True"
+                    Background="#0b0b0b"
+                    Foreground="#d8d8d8"
+                    BorderThickness="0"
+                    ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+          </Border>
+
+          <Border Grid.Column="2" BorderBrush="#444" BorderThickness="1" Padding="8">
+            <TextBox Text="{Binding Docker.Units.SelectedUnit.Logs.DockerErrBuffer}"
+                    CaretIndex="{Binding Docker.Units.SelectedUnit.Logs.DockerErrCaret}"
+                    TextWrapping="Wrap"
+                    FontFamily="Consolas, Menlo, monospace"
+                    IsReadOnly="True"
+                    AcceptsReturn="True"
+                    Background="#0b0b0b"
+                    Foreground="#d8d8d8"
+                    BorderThickness="0"
+                    ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+          </Border>
+
+        </Grid>
+
+        <!-- Row 1: Gateway (big) -->
+        <Border Grid.Row="1" BorderBrush="#444" BorderThickness="1" Margin="0,0,0,8" Padding="8">
+          <TextBox Text="{Binding Docker.Units.SelectedUnit.Logs.GatewayLogBuffer}"
+                  CaretIndex="{Binding Docker.Units.SelectedUnit.Logs.GatewayLogCaret}"
+                  TextWrapping="Wrap"
+                  FontFamily="Consolas, Menlo, monospace"
+                  IsReadOnly="True"
+                  AcceptsReturn="True"
+                  Background="#0b0b0b"
+                  Foreground="#d8d8d8"
+                  BorderThickness="0"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+        </Border>
+
+        <!-- Row 2: Container IO (big) -->
+        <Border Grid.Row="2" BorderBrush="#444" BorderThickness="1" Margin="0,0,0,8" Padding="8">
+          <TextBox Text="{Binding Docker.Units.SelectedUnit.Logs.ContainerIOBuffer}"
+                  CaretIndex="{Binding Docker.Units.SelectedUnit.Logs.ContainerIOCaret}"
+                  TextWrapping="Wrap"
+                  FontFamily="Consolas, Menlo, monospace"
+                  IsReadOnly="True"
+                  AcceptsReturn="True"
+                  Background="#0b0b0b"
+                  Foreground="#d8d8d8"
+                  BorderThickness="0"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+        </Border>
+
+        <!-- Row 3: Input -->
+        <TextBox x:Name="ContainerCmdBox"
+                Grid.Row="3"
+                AcceptsReturn="True"
+                MaxHeight="200"
+                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                Watermark="Befehl im Container ausführen (z. B. pip list)"
+                Text="{Binding Docker.Controller.ContainerCommand, Mode=TwoWay}">
+          <TextBox.KeyBindings>
+            <KeyBinding Gesture="Enter"
+                        Command="{Binding Commands.ExecuteInContainerCommand}"
+                        CommandParameter="{Binding Text, ElementName=ContainerCmdBox}" />
+          </TextBox.KeyBindings>
+        </TextBox>
+
+      </Grid>
+
+
+
+    </Grid>
+  </Grid>
+
+</UserControl>

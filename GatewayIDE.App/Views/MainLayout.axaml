@@ -1,0 +1,56 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+
+             xmlns:views="clr-namespace:GatewayIDE.App.Views"
+             xmlns:docker="clr-namespace:GatewayIDE.App.Views.Docker"
+             xmlns:dash="clr-namespace:GatewayIDE.App.Views.Dashboard"
+             xmlns:explorer="clr-namespace:GatewayIDE.App.Views.Explorer"
+             xmlns:engines="clr-namespace:GatewayIDE.App.Views.Engines"
+             xmlns:github="clr-namespace:GatewayIDE.App.Views.GitHub"
+             xmlns:net="clr-namespace:GatewayIDE.App.Views.Network"
+             xmlns:settings="clr-namespace:GatewayIDE.App.Views.Settings"
+             xmlns:chat="clr-namespace:GatewayIDE.App.Views.Chat"
+             xmlns:ki="clr-namespace:GatewayIDE.App.Views.KiSystem"
+
+             x:Class="GatewayIDE.App.Views.MainLayout">
+
+  <!-- Root Layout: LeftRail | SidePanel | Workspace -->
+  <Grid ColumnDefinitions="56,Auto,*"
+        Background="#0f0f0f">
+
+    <!-- LeftRail -->
+    <views:LeftRail Grid.Column="0"/>
+
+    <!-- Workspace -->
+    <Grid Grid.Column="2">
+
+      <!-- Dashboard -->
+      <dash:DashboardPanel IsVisible="{Binding Layout.IsDashboard}" />
+
+      <!-- VS / Explorer -->
+      <explorer:ExplorerPanel IsVisible="{Binding Layout.IsExplorer}" />
+
+      <!-- Engines -->
+      <engines:EnginesPanel IsVisible="{Binding Layout.IsEngines}" />
+
+      <!-- GitHub -->
+      <github:GitHubPanel IsVisible="{Binding Layout.IsGitHub}" />
+
+      <!-- Network -->
+      <net:NetworkPanel IsVisible="{Binding Layout.IsNetwork}" />
+
+      <!-- Docker -->
+      <docker:DockerPanel IsVisible="{Binding Layout.IsDocker}" />
+
+      <!-- KI System -->
+      <ki:KiSystemPanel IsVisible="{Binding Layout.IsKiSystem}" />
+
+      <!-- Settings -->
+      <settings:SettingsPanel IsVisible="{Binding Layout.IsSettings}" />
+
+      <!-- Chat -->
+      <chat:SidePanel IsVisible="{Binding Layout.IsChat}" />
+
+    </Grid>
+  </Grid>
+</UserControl>

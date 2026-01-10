@@ -1,0 +1,38 @@
+[project]
+name = "IDE"
+version = "0.9.27"
+description = "Gatweway with Zep integration for Autogen [AG2]"
+
+requires-python = ">=3.11"
+
+
+    dependencies = [
+        # Web stack
+        "fastapi==0.118.0",                   # latest FastAPI release (Sep 28 2025)
+        "uvicorn>=0.37.0",                    # pin minimum Uvicorn version (Sep 23 2025)
+        "watchfiles>=1.1.0",                  # modern file watcher (replaces watchdog)
+
+        # Data & utils
+        "pydantic==2.11.10",                  # latest Pydantic (Oct 4 2025)
+        "typing-extensions>=4.15.0",          # update to latest typing extensions (Aug 25 2025)
+        "loguru==0.7.3",                      # bump Loguru (Dec 6 2024)
+        "python-dotenv>=1.1.1",               # latest python‑dotenv (Jun 23 2025)
+        "rich>=14.1.0",                       # update Rich (Jul 25 2025)
+
+        "httpx>=0.28.1",                      # latest HTTPX (Dec 6 2024)
+
+
+    ]
+
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov",
+    "pytest-asyncio",
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+]
+
+[tool.uv.pip]
+extra-index-url = ["https://pypi.org/simple"]

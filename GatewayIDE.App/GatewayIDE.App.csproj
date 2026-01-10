@@ -1,0 +1,56 @@
+<!-- GatewayIDE.App/GatewayIDE.App.csproj -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>GatewayIDE.App</AssemblyName>
+    <UseGrpc>false</UseGrpc>
+  </PropertyGroup>
+
+  <!-- EIN gemeinsamer Paketblock, keine Duplikate -->
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.1.3" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.1.3" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="11.1.3" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.1.3" />
+
+    <PackageReference Include="Grpc.Tools" Version="2.63.0" PrivateAssets="All" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.63.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.25.3" />
+    <!-- Network crypto -->
+    <PackageReference Include="NSec.Cryptography" Version="24.4.0" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="9.0.0" />
+  </ItemGroup>
+
+  <!-- XAML: erst alles entfernen, dann explizit einbinden -->
+  <ItemGroup>
+    <AvaloniaXaml Remove="**\*.axaml" />
+    <AvaloniaResource Remove="**\*.axaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaXaml Include="App.axaml" />
+    <AvaloniaXaml Include="MainWindow.axaml" />
+    <AvaloniaXaml Include="Views\MainLayout.axaml" />
+    <AvaloniaXaml Include="Views\LeftRail.axaml" />
+    <AvaloniaXaml Include="Views\Chat\SidePanel.axaml" />
+    <AvaloniaXaml Include="Views\Docker\DockerPanel.axaml" />
+    <AvaloniaXaml Include="Views\KiSystem\KiSystemPanel.axaml" />
+    <AvaloniaXaml Include="Views\Engines\EnginesPanel.axaml" />
+    <AvaloniaXaml Include="Views\GitHub\GitHubPanel.axaml" />
+    <AvaloniaXaml Include="Views\Explorer\ExplorerPanel.axaml" />
+    <AvaloniaXaml Include="Views\Settings\SettingsPanel.axaml" />
+    <AvaloniaXaml Include="Views\Network\NetworkPanel.axaml" />
+    <AvaloniaXaml Include="Views\Dashboard\DashboardPanel.axaml" />
+  </ItemGroup>
+
+  <!-- Assets -->
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+
+
+  </ItemGroup>
+</Project>

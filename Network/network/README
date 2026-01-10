@@ -1,0 +1,220 @@
+# GatewayIDE – Secure Network Milestone
+
+## WireGuard → Nebula
+
+### Status
+
+🟡 In Planung / Architekturphase
+Dieser Meilenstein definiert die Netzwerk- und Sicherheitsbasis für GatewayIDE und das spätere **Cyber Fantasy World Network**.
+
+---
+
+## Ziel des Meilensteins
+
+Ziel ist der Aufbau eines **gesicherten Multi-User-Netzwerks**, in dem:
+
+* Clients sich **vor dem Start jeglicher Engines** mit einem zentralen GatewayIDE-Server verbinden
+* Authentifizierung, Rechte und Sitzungen **zwingend vorgeschaltet** sind
+* Engines **niemals direkt exponiert** werden
+* ein sicheres Heim- / Firmennetz mit **statischer IP** als Anker dient
+* externe Nutzer kontrolliert Teil des Netzwerks werden können
+
+Dieser Meilenstein legt **keine UI**, **keine Engines** und **keine Agentenlogik** fest –
+er schafft ausschließlich die **Netzwerk- und Sicherheitsgrundlage**.
+
+---
+
+## Backend-Fokus dieses Meilensteins
+
+Der Schwerpunkt liegt explizit auf dem **Backend**.
+
+* Netzwerklogik liegt unter `backend/network/`
+* Öffentliche und interne API-Schnittstellen liegen unter `backend/routes/`
+* Das Backend fungiert als **Control Plane** zwischen Netzwerk, Authentifizierung und Engines
+
+Die IDE selbst ist in diesem Meilenstein lediglich ein Client des Backends.
+
+---
+
+## Architektur-Prinzipien
+
+### 1. Control Plane vor Execution
+
+Kein Engine-Start, kein Projektzugriff, keine Runtime-Aktion ohne:
+
+* gültige Netzwerkverbindung
+* authentifizierten Nutzer
+* serverseitige Entscheidung
+
+### 2. Zero Trust innerhalb des Netzes
+
+* Kein implizites Vertrauen aufgrund von IP, Standort oder Port
+* Jeder Zugriff ist:
+
+  * authentifiziert
+  * autorisiert
+  * protokolliert
+
+### 3. Trennung der Ebenen
+
+* **Netzwerk** ≠ **Auth** ≠ **Engines**
+* Clients sprechen **nie direkt** mit Engines
+* Alles läuft über die GatewayIDE-Control-Plane
+
+---
+
+## Phase 1: WireGuard (Baseline)
+
+WireGuard bildet die **erste stabile Netzwerkbasis**.
+
+### Warum WireGuard zuerst?
+
+* Minimalistisch, auditierbar, performant
+* Vollständig self-hosted
+* Ideal für:
+
+  * statische IPs
+  * Heim- / Firmennetze
+  * kontrollierte Peer-Zugänge
+
+### Rolle von WireGuard im Backend
+
+WireGuard selbst ist **kein Teil der Business-Logik**, wird jedoch durch das Backend **verwaltet und kontrolliert**:
+
+* Peer-Erstellung erfolgt serverseitig
+* Schlüsselmaterial wird nie unkontrolliert verteilt
+* Peers sind immer einem Nutzer **und** einem Gerät zugeordnet
+
+Das Backend entscheidet:
+
+* **wer** einen Peer bekommt
+* **wann** ein Peer aktiv ist
+* **welche Subnetze** erreichbar sind
+
+### Eigenschaften
+
+* Jeder Client = eigener Peer
+* Eigene Keypaare pro Nutzer / Gerät
+* Netzwerksegmentierung über AllowedIPs
+* GatewayIDE-Server als zentraler Hub (Hub-and-Spoke)
+
+### Erwartete Struktur (Beispiel)
+
+```
+CyberFantasyNet (WireGuard)
+├── GatewayIDE Server        (10.77.0.10)
+├── Admin / Owner Clients    (10.77.0.20–29)
+├── Developer Clients        (10.77.0.30–99)
+└── Service Subnets          (nicht direkt erreichbar)
+```
+
+Engines und interne Services liegen **außerhalb** des Client-Subnetzes.
+
+---
+
+## Backend-Verzeichnisstruktur (geplant)
+
+```
+backend/
+├── network/
+│   ├── README.txt          # Netzwerkarchitektur & Konzepte
+│   ├── wireguard.py        # Peer- & Config-Management
+│   ├── nebula.py           # später: Nebula-Integration
+│   └── models.py           # Network / Peer / Device Modelle
+│
+├── routes/
+│   ├── network.py          # API: Netzwerkstatus, Enrollment
+│   ├── devices.py          # Geräte-Registrierung
+│   └── admin_network.py    # Admin-only Netzwerkoperationen
+```
+
+---
+
+## API-Rollen im Netzwerk-Kontext
+
+### Öffentliche (authentifizierte) Routen
+
+* Netzwerkstatus des Clients
+* Eigene Peer-Informationen
+* Verbindungs- & Health-Checks
+
+### Interne / Admin-Routen
+
+* Peer-Erstellung / Deaktivierung
+* AllowedIPs-Änderungen
+* Geräte-Sperrung
+* Audit-Abfragen
+
+Alle Netzwerk-relevanten Routen sind **nicht öffentlich exponiert**, sondern:
+
+* nur über VPN erreichbar
+* zusätzlich durch Auth & RBAC geschützt
+
+---
+
+## Phase 2: Nebula (Skalierung & World Network)
+
+Nach Stabilisierung von WireGuard folgt **Nebula** als zweite Ebene.
+
+### Warum Nebula später?
+
+* Eigene PKI
+* Sehr feingranulare ACLs
+* Ideal für:
+
+  * größere, verteilte Netze
+  * wechselnde Standorte
+  * „World Network“-Topologie
+
+### Rolle von Nebula im Backend
+
+* Kryptografische Identitäten statt IP-Fokus
+* Policy-gesteuerte Kommunikation zwischen Nodes
+* Föderationsfähigkeit für spätere Standorte
+
+WireGuard bleibt dabei:
+
+* als Fallback
+* als lokales Backbone
+* als Admin-Zugangsnetz
+
+---
+
+## Sicherheitsziele dieses Meilensteins
+
+✔ Keine offenen Engine-Ports
+✔ Keine direkten Client → Engine Verbindungen
+✔ Keine Klartext-Kommunikation
+✔ Abschaltbare, rotierbare Zugänge
+✔ Trennung von Nutzer-, Geräte- und Netzwerkidentität
+
+---
+
+## Nicht Teil dieses Meilensteins
+
+✖ UI / IDE-Design
+✖ Agenten / KI-Logik
+✖ Engine-Implementierungen
+✖ Projekt- oder Workspace-Management
+
+Diese Themen bauen **später** auf dieser Basis auf.
+
+---
+
+## Ausblick (nächste Meilensteine)
+
+* Authentifizierung & RBAC (OIDC / Sessions)
+* Device Enrollment & Trust
+* Engine Control via Capability Tokens
+* Audit- & Security-Logging
+* Übergang WireGuard → Nebula Federation
+
+---
+
+## Leitgedanke
+
+> **Execution folgt Vertrauen.
+> Vertrauen folgt Kontrolle.
+> Kontrolle folgt Struktur.**
+
+Dieser Meilenstein schafft die Struktur.

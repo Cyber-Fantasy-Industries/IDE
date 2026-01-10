@@ -1,0 +1,7 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="GatewayIDE.App.Views.Engines.EnginesPanel">
+  <Border Background="#121212" Padding="16">
+    <TextBlock Text="ENGINES" Foreground="#eaeaea" FontSize="18"/>
+  </Border>
+</UserControl>

@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="GatewayIDE.App.Views.Chat.SidePanel">
+
+  <Border Background="#3b3f46"
+          Width="{Binding Chat.LeftPaneWidth}"
+          MinWidth="0">
+
+    <Grid>
+      <!-- CHAT-MODUS -->
+      <Grid RowDefinitions="*,Auto"
+            Margin="8"
+            IsVisible="{Binding Chat.IsSidePanelShowingChat}">
+
+        <ListBox Grid.Row="0"
+                 ItemsSource="{Binding Chat.ChatLines}"
+                 SelectedIndex="{Binding Chat.ChatSelectedIndex}"/>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+          <TextBox Width="240"
+                   Text="{Binding Chat.ChatInput}"
+                   Watermark="Type…"
+                   KeyDown="ChatInput_KeyDown"/>
+          <Button Content="Send" Command="{Binding Commands.SendChatCommand}"/>
+        </StackPanel>
+      </Grid>
+
+
+    </Grid>
+  </Border>
+</UserControl>

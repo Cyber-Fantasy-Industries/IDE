@@ -1,0 +1,75 @@
+# .gitignore
+# Binaries
+out/
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Secrets
+
+dev.env
+net.dev.env
+net.prod.env
+.env
+.env.local
+
+# Environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.python-version
+.uv_cache/
+__pypackages__/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+build/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.pytest_cache/
+.coverage
+.mypy_cache/
+.dmypy.json
+dmypy.json
+# uv.lock
+.ipynb_checkpoints
+
+# IDEs
+.vscode/
+.vs/
+.idea/
+.history
+*.user
+*.suo
+*.userprefs
+*.DotSettings*
+
+# Build & Artefakte
+**/bin/
+**/obj/
+bin/
+obj/
+*.lnk
+IDE-crash.log
+

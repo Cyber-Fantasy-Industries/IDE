@@ -1,0 +1,9 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="GatewayIDE.App.Views.Settings.SettingsPanel">
+  <Border Background="#121212" Padding="16">
+    <TextBlock Text="SETTINGS"
+               Foreground="#eaeaea"
+               FontSize="18"/>
+  </Border>
+</UserControl>

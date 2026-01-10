@@ -1,0 +1,68 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="GatewayIDE.App.Views.KiSystem.KiSystemPanel">
+
+<Grid IsVisible="{Binding Layout.IsKiSystem}"
+                    ColumnDefinitions="3*,*"
+                    RowDefinitions="3*,*"
+                    Margin="8">
+                <!-- 2x2 Thread-Board links -->
+                <Grid Grid.Column="0" Grid.Row="0"
+                      RowDefinitions="*,*"
+                      ColumnDefinitions="*,*">
+                  <Border Grid.Row="0" Grid.Column="0" BorderBrush="#444" BorderThickness="1" Margin="4">
+                    <TextBox x:Name="T2Box"
+                            Text="{Binding Threads.Buffers.T2Buffer}"
+                            CaretIndex="{Binding Threads.Buffers.T2Caret}"
+                            FontFamily="Consolas, Menlo, monospace"
+                            Background="#0b0b0b" Foreground="#d8d8d8"
+                            AcceptsReturn="True" IsReadOnly="True"
+                            TextWrapping="Wrap"
+                            ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+                  </Border>
+                  <Border Grid.Row="0" Grid.Column="1" BorderBrush="#444" BorderThickness="1" Margin="4">
+                    <TextBox x:Name="T4Box"
+                            Text="{Binding Threads.Buffers.T4Buffer}"
+                            CaretIndex="{Binding Threads.Buffers.T4Caret}"
+                            FontFamily="Consolas, Menlo, monospace"
+                            Background="#0b0b0b" Foreground="#d8d8d8"
+                            AcceptsReturn="True" IsReadOnly="True"
+                            TextWrapping="Wrap"
+                            ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+                  </Border>
+                  <Border Grid.Row="1" Grid.Column="0" BorderBrush="#444" BorderThickness="1" Margin="4">
+                    <TextBox x:Name="T5Box"
+                            Text="{Binding Threads.Buffers.T5Buffer}"
+                            CaretIndex="{Binding Threads.Buffers.T5Caret}"
+                            FontFamily="Consolas, Menlo, monospace"
+                            Background="#0b0b0b" Foreground="#d8d8d8"
+                            AcceptsReturn="True" IsReadOnly="True"
+                            TextWrapping="Wrap"
+                            ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+                  </Border>
+                  <Border Grid.Row="1" Grid.Column="1" BorderBrush="#444" BorderThickness="1" Margin="4">
+                    <TextBox x:Name="T6Box"
+                            Text="{Binding Threads.Buffers.T6Buffer}"
+                            CaretIndex="{Binding Threads.Buffers.T6Caret}"
+                            FontFamily="Consolas, Menlo, monospace"
+                            Background="#0b0b0b" Foreground="#d8d8d8"
+                            AcceptsReturn="True" IsReadOnly="True"
+                            TextWrapping="Wrap"
+                            ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+                  </Border>
+                </Grid>
+
+                <!-- Rechte Spalte: Platzhalter -->
+                <Grid Grid.Column="1" Grid.RowSpan="2" RowDefinitions="*,*,*" Margin="4,0,0,0">
+                  <Border Grid.Row="0" BorderBrush="#333" BorderThickness="1" Margin="4"/>
+                  <Border Grid.Row="1" BorderBrush="#333" BorderThickness="1" Margin="4"/>
+                  <Border Grid.Row="2" BorderBrush="#333" BorderThickness="1" Margin="4"/>
+                </Grid>
+
+                <!-- Unteres Fenster links -->
+                <Border Grid.Column="0" Grid.Row="1" BorderBrush="#444" BorderThickness="1" Margin="4">
+                  <!-- Platzhalter -->
+                </Border>
+              </Grid>
+
+</UserControl>
