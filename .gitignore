@@ -10,9 +10,6 @@ out/
 
 # Secrets
 
-dev.env
-net.dev.env
-net.prod.env
 .env
 .env.local
 
