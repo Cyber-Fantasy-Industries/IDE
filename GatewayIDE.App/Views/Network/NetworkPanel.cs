@@ -11,7 +11,7 @@ using Avalonia.Markup.Xaml;
 
 using Microsoft.Extensions.DependencyInjection;
 
-using GatewayIDE.App.Commands;          // ✅ Commands.Delegate
+using GatewayIDE.App.Commands;
 using GatewayIDE.App.Services.App;
 using GatewayIDE.App.Services.Network;
 
@@ -23,11 +23,10 @@ public partial class NetworkPanel : UserControl
     {
         AvaloniaXamlLoader.Load(this);
 
-        // Optional, aber empfohlen: DataContext via DI (wenn verfügbar)
-        // Falls App.Services (IServiceProvider) noch nicht existiert: bleibt DataContext null -> kein Crash.
+        // Optional: DataContext via DI (wenn verfügbar)
         try
         {
-            var sp = App.Services; // falls du App.Services noch nicht hast, siehe Abschnitt 2 unten
+            var sp = App.Services;
             if (sp != null)
             {
                 var vm = sp.GetRequiredService<NetworkPanelViewModel>();
@@ -36,7 +35,7 @@ public partial class NetworkPanel : UserControl
         }
         catch
         {
-            // bewusst still: UI soll nicht crashen, wenn DI noch nicht fertig ist
+            // UI soll nicht crashen, wenn DI noch nicht fertig ist
         }
     }
 }
@@ -62,12 +61,12 @@ public sealed class NetworkPanelViewModel : INotifyPropertyChanged
         appState.Authenticated += _ => RefreshCanExecutes();
         appState.LoggedOut += () => RefreshCanExecutes();
 
-        RefreshStatusCommand     = new Commands.Delegate(async _ => await RefreshStatusAsync(), _ => _session.IsReady);
-        RefreshSelfPeerCommand   = new Commands.Delegate(async _ => await RefreshSelfPeerAsync(), _ => _session.IsReady);
-        EnrollCommand            = new Commands.Delegate(async _ => await EnrollAsync(), _ => _session.IsReady && !string.IsNullOrWhiteSpace(InviteCode));
+        RefreshStatusCommand   = new AsyncCommand(async _ => await RefreshStatusAsync(), _ => _session.IsReady);
+        RefreshSelfPeerCommand = new AsyncCommand(async _ => await RefreshSelfPeerAsync(), _ => _session.IsReady);
+        EnrollCommand          = new AsyncCommand(async _ => await EnrollAsync(), _ => _session.IsReady && !string.IsNullOrWhiteSpace(InviteCode));
 
-        RefreshPeersCommand      = new Commands.Delegate(async _ => await RefreshPeersAsync(), _ => _session.IsReady && IsAdmin);
-        CreateInviteCommand      = new Commands.Delegate(async _ => await CreateInviteAsync(), _ => _session.IsReady && IsAdmin);
+        RefreshPeersCommand = new AsyncCommand(async _ => await RefreshPeersAsync(), _ => _session.IsReady && IsAdmin);
+        CreateInviteCommand = new AsyncCommand(async _ => await CreateInviteAsync(), _ => _session.IsReady && IsAdmin);
     }
 
     // ---------- UI Properties ----------
@@ -104,12 +103,12 @@ public sealed class NetworkPanelViewModel : INotifyPropertyChanged
 
     // ---------- Commands ----------
 
-    public Commands.Delegate RefreshStatusCommand { get; }
-    public Commands.Delegate RefreshSelfPeerCommand { get; }
-    public Commands.Delegate EnrollCommand { get; }
+    public AsyncCommand RefreshStatusCommand { get; }
+    public AsyncCommand RefreshSelfPeerCommand { get; }
+    public AsyncCommand EnrollCommand { get; }
 
-    public Commands.Delegate RefreshPeersCommand { get; }
-    public Commands.Delegate CreateInviteCommand { get; }
+    public AsyncCommand RefreshPeersCommand { get; }
+    public AsyncCommand CreateInviteCommand { get; }
 
     // ---------- Command Methods ----------
 

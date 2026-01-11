@@ -1,205 +1,264 @@
 using System;
+using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-using GatewayIDE.App;                  // MainLayoutState
-using GatewayIDE.App.ViewModels;        // MainWindowViewModel
-using GatewayIDE.App.Views.Docker;      // ServiceUnitVm
-using GatewayIDE.App.Views.KiSystem;    // ThreadId  <-- falls ThreadId dort liegt
-
 namespace GatewayIDE.App.Commands;
 
 /// <summary>
-/// Zentrale Command-Sammlung für GatewayIDE.
+/// App-weite Commands.
+///
+/// Wichtig: Diese Datei ist absichtlich "refactor-resistent":
+/// - Keine harten Abhängigkeiten auf volatile UI-Typen (z.B. ServiceUnitVm)
+/// - Keine harten Abhängigkeiten auf LayoutState-Konstanten
+/// Dadurch bekommst du deutlich weniger CS0246/Namespace-Drift beim Umbenennen/Verschieben.
 /// </summary>
-public static class Commands
+public sealed class MainCommands
 {
-    public sealed class MainCommands
+    public ICommand ToggleChatCommand { get; }
+    public ICommand SelectTabCommand { get; }
+    public ICommand SendChatCommand { get; }
+
+    public ICommand MenuActionCommand { get; }
+
+    public ICommand RebuildGatewayCommand { get; }
+    public ICommand StartGatewayCommand { get; }
+    public ICommand StopGatewayCommand { get; }
+    public ICommand RestartGatewayCommand { get; }
+    public ICommand RemoveGatewayContainerCommand { get; }
+    public ICommand ClearAllLogsCommand { get; }
+    public ICommand ClearSelectedLogsCommand { get; }
+    public ICommand ExecuteInContainerCommand { get; }
+    public ICommand OpenUnitCommand { get; }
+
+    private readonly GatewayIDE.App.MainState _state;
+
+    public MainCommands(GatewayIDE.App.MainState state)
     {
-        public ICommand ToggleChatCommand { get; }
-        public ICommand SelectTabCommand { get; }
-        public ICommand SendChatCommand { get; }
+        _state = state;
 
-        public ICommand MenuActionCommand { get; }
+        ToggleChatCommand =
+            new AsyncCommand(_ => _state.Chat.ToggleChatSidebar());
 
-        public ICommand RebuildGatewayCommand { get; }
-        public ICommand StartGatewayCommand { get; }
-        public ICommand StopGatewayCommand { get; }
-        public ICommand RestartGatewayCommand { get; }
-        public ICommand RemoveGatewayContainerCommand { get; }
-        public ICommand ClearAllLogsCommand { get; }
-        public ICommand ClearSelectedLogsCommand { get; }
-        public ICommand ExecuteInContainerCommand { get; }
-        public ICommand OpenUnitCommand { get; }
+        SelectTabCommand =
+            new AsyncCommand(async p =>
+            {
+                // kein LayoutState.TAB_* mehr (zu volatil) -> fallback auf bestehenden ActiveTab oder "dash"
+                var tab = p?.ToString();
+                if (string.IsNullOrWhiteSpace(tab))
+                    tab = _state.Layout.ActiveTab ?? "dash";
 
-        private readonly MainWindowViewModel _vm;
+                _state.Layout.ActiveTab = tab;
 
-        private static void SelectUnitIfProvided(MainWindowViewModel vm, object? parameter)
-        {
-            if (parameter is ServiceUnitVm unit)
-                vm.Docker.Units.SelectedUnit = unit;
-        }
+                if (_state.Layout.IsDocker)
+                    await _state.Docker.Controller.RefreshSystemStatusAsync();
+            });
 
-        public MainCommands(MainWindowViewModel vm)
-        {
-            _vm = vm;
+        SendChatCommand =
+            new AsyncCommand(async _ => await _state.Chat.SendAsync());
 
-            ToggleChatCommand =
-                new Commands.Delegate(_ => vm.Chat.ToggleChatSidebar());
+        MenuActionCommand =
+            new AsyncCommand(p => OnMenuAction(p?.ToString()));
 
-            SelectTabCommand =
-                new Commands.Delegate(async p =>
-                {
-                    var tab = p?.ToString() ?? MainLayoutState.TAB_DASH;
-                    vm.Layout.ActiveTab = tab;
+        RebuildGatewayCommand =
+            new AsyncCommand(async p =>
+            {
+                SelectUnitIfProvided(_state, p);
+                await _state.Docker.Controller.UnitFullRebuildAsync();
+            });
 
-                    if (vm.Layout.IsDocker)
-                        await vm.Docker.Controller.RefreshSystemStatusAsync();
-                });
+        StartGatewayCommand =
+            new AsyncCommand(async p =>
+            {
+                SelectUnitIfProvided(_state, p);
+                await _state.Docker.Controller.UnitStartAsync();
+            });
 
-            SendChatCommand =
-                new Commands.Delegate(async _ => await vm.Chat.SendAsync());
+        StopGatewayCommand =
+            new AsyncCommand(async p =>
+            {
+                SelectUnitIfProvided(_state, p);
+                await _state.Docker.Controller.UnitStopAsync();
+            });
 
-            MenuActionCommand =
-                new Commands.Delegate(p => OnMenuAction(p?.ToString()));
+        RestartGatewayCommand =
+            new AsyncCommand(async p =>
+            {
+                SelectUnitIfProvided(_state, p);
+                await _state.Docker.Controller.UnitRestartAsync();
+            });
 
-            RebuildGatewayCommand =
-                new Commands.Delegate(async p =>
-                {
-                    SelectUnitIfProvided(vm, p);
-                    await vm.Docker.Controller.UnitFullRebuildAsync();
-                });
+        RemoveGatewayContainerCommand =
+            new AsyncCommand(async p =>
+            {
+                SelectUnitIfProvided(_state, p);
+                await _state.Docker.Controller.UnitRemoveContainerAsync();
+            });
 
-            StartGatewayCommand =
-                new Commands.Delegate(async p =>
-                {
-                    SelectUnitIfProvided(vm, p);
-                    await vm.Docker.Controller.UnitStartAsync();
-                });
+        ClearAllLogsCommand =
+            new AsyncCommand(_ =>
+            {
+                foreach (var u in _state.Docker.Units.Units)
+                    u.Logs.ClearAll();
+            });
 
-            StopGatewayCommand =
-                new Commands.Delegate(async p =>
-                {
-                    SelectUnitIfProvided(vm, p);
-                    await vm.Docker.Controller.UnitStopAsync();
-                });
+        ClearSelectedLogsCommand =
+            new AsyncCommand(p =>
+            {
+                SelectUnitIfProvided(_state, p);
+                _state.Docker.Units.SelectedUnit?.Logs.ClearAll();
+            });
 
-            RestartGatewayCommand =
-                new Commands.Delegate(async p =>
-                {
-                    SelectUnitIfProvided(vm, p);
-                    await vm.Docker.Controller.UnitRestartAsync();
-                });
+        OpenUnitCommand =
+            new AsyncCommand(async p =>
+            {
+                SelectUnitIfProvided(_state, p);
+                await _state.Docker.Controller.RefreshSystemStatusAsync();
+                _state.Docker.Controller.StartTailLogs();
+            });
 
-            RemoveGatewayContainerCommand =
-                new Commands.Delegate(async p =>
-                {
-                    SelectUnitIfProvided(vm, p);
-                    await vm.Docker.Controller.UnitRemoveContainerAsync();
-                });
-
-            ClearAllLogsCommand =
-                new Commands.Delegate(_ =>
-                {
-                    foreach (var u in vm.Docker.Units.Units)
-                        u.Logs.ClearAll();
-                });
-
-            ClearSelectedLogsCommand =
-                new Commands.Delegate(p =>
-                {
-                    SelectUnitIfProvided(vm, p);
-                    vm.Docker.Units.SelectedUnit?.Logs.ClearAll();
-                });
-
-            OpenUnitCommand =
-                new Commands.Delegate(async p =>
-                {
-                    SelectUnitIfProvided(vm, p);
-                    await vm.Docker.Controller.RefreshSystemStatusAsync();
-                    vm.Docker.Controller.StartTailLogs();
-                });
-
-            ExecuteInContainerCommand =
-                new Commands.Delegate(async p =>
-                    await vm.Docker.Controller.ExecuteInContainerAsync(p as string));
-        }
-
-        private void OnMenuAction(string? id)
-        {
-            if (string.IsNullOrWhiteSpace(id)) return;
-            _vm.Threads.Append(ThreadId.T1, $"[MENU] {id}");
-            Console.WriteLine("[MENU] " + id);
-        }
+        ExecuteInContainerCommand =
+            new AsyncCommand(async p => await _state.Docker.Controller.ExecuteInContainerAsync(p as string));
     }
 
-    /// <summary>
-    /// Universeller ICommand:
-    /// - sync oder async
-    /// - verhindert Reentrancy
-    /// - deaktiviert CanExecute während async läuft
-    /// </summary>
-    public sealed class Delegate : ICommand
+    private static void SelectUnitIfProvided(global::GatewayIDE.App.MainState state, object? parameter)
     {
-        private readonly Action<object?>? _execute;
-        private readonly Func<object?, Task>? _executeAsync;
-        private readonly Func<object?, bool>? _canExecute;
+        if (parameter is null) return;
 
-        private int _isRunning;
+        // state.Docker.Units.SelectedUnit ist typisiert (z.B. ServiceUnitVm).
+        // Damit wir nicht hart gegen diesen Typ linken, setzen wir per Reflection,
+        // aber nur wenn der Parametertyp passt.
+        var units = state.Docker?.Units;
+        if (units is null) return;
 
-        public event EventHandler? CanExecuteChanged;
+        var prop = units.GetType().GetProperty("SelectedUnit", BindingFlags.Instance | BindingFlags.Public);
+        if (prop is null || !prop.CanWrite) return;
 
-        public Delegate(Action<object?> execute, Func<object?, bool>? canExecute = null)
+        if (prop.PropertyType.IsInstanceOfType(parameter))
+            prop.SetValue(units, parameter);
+    }
+
+    private void OnMenuAction(string? id)
+    {
+        if (string.IsNullOrWhiteSpace(id)) return;
+
+        var msg = $"[MENU] {id}";
+
+        // Optional: wenn Threads.Append vorhanden ist, versuchen wir zu schreiben,
+        // ohne harte ThreadId-Abhängigkeit.
+        TryAppendToThreads(_state, msg);
+
+        Console.WriteLine(msg);
+    }
+
+    private static void TryAppendToThreads(global::GatewayIDE.App.MainState state, string msg)
+    {
+        var threadsObj = (object?)state.GetType().GetProperty("Threads", BindingFlags.Instance | BindingFlags.Public)?.GetValue(state);
+        if (threadsObj is null) return;
+
+        // 1) Append(string, string)
+        var appendStr = threadsObj.GetType().GetMethod("Append", new[] { typeof(string), typeof(string) });
+        if (appendStr != null)
         {
-            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
-            _canExecute = canExecute;
+            appendStr.Invoke(threadsObj, new object[] { "T1", msg });
+            return;
         }
 
-        public Delegate(Func<object?, Task> executeAsync, Func<object?, bool>? canExecute = null)
+        // 2) Append(ThreadIdEnum, string) oder ähnliches
+        var candidates = threadsObj.GetType()
+            .GetMethods(BindingFlags.Instance | BindingFlags.Public)
+            .Where(m => m.Name == "Append" && m.GetParameters().Length == 2)
+            .ToList();
+
+        foreach (var m in candidates)
         {
-            _executeAsync = executeAsync ?? throw new ArgumentNullException(nameof(executeAsync));
-            _canExecute = canExecute;
+            var ps = m.GetParameters();
+            if (ps[1].ParameterType != typeof(string)) continue;
+
+            var t = ps[0].ParameterType;
+            if (!t.IsEnum) continue;
+
+            // versuche Enum-Wert "T1"
+            var names = Enum.GetNames(t);
+            var t1Name = names.FirstOrDefault(n => string.Equals(n, "T1", StringComparison.OrdinalIgnoreCase));
+            if (t1Name is null) continue;
+
+            var t1Value = Enum.Parse(t, t1Name);
+            m.Invoke(threadsObj, new object[] { t1Value, msg });
+            return;
+        }
+    }
+}
+
+/// <summary>
+/// Universeller ICommand:
+/// - sync oder async
+/// - verhindert Reentrancy
+/// - deaktiviert CanExecute während async läuft
+/// </summary>
+public sealed class AsyncCommand : ICommand
+{
+    private readonly Action<object?>? _execute;
+    private readonly Func<object?, Task>? _executeAsync;
+    private readonly Func<object?, bool>? _canExecute;
+
+    private int _isRunning;
+
+    public event EventHandler? CanExecuteChanged;
+
+    // Sync
+    public AsyncCommand(Action<object?> execute, Func<object?, bool>? canExecute = null)
+    {
+        _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+        _canExecute = canExecute;
+    }
+
+    // Async
+    public AsyncCommand(Func<object?, Task> executeAsync, Func<object?, bool>? canExecute = null)
+    {
+        _executeAsync = executeAsync ?? throw new ArgumentNullException(nameof(executeAsync));
+        _canExecute = canExecute;
+    }
+
+    public bool CanExecute(object? parameter)
+    {
+        if (_executeAsync != null && Volatile.Read(ref _isRunning) == 1)
+            return false;
+
+        return _canExecute?.Invoke(parameter) ?? true;
+    }
+
+    public async void Execute(object? parameter)
+    {
+        if (!CanExecute(parameter)) return;
+
+        if (_execute != null)
+        {
+            _execute(parameter);
+            return;
         }
 
-        public bool CanExecute(object? parameter)
+        if (_executeAsync != null)
         {
-            if (_executeAsync != null && Volatile.Read(ref _isRunning) == 1)
-                return false;
-
-            return _canExecute?.Invoke(parameter) ?? true;
-        }
-
-        public async void Execute(object? parameter)
-        {
-            if (!CanExecute(parameter)) return;
-
-            if (_execute != null)
-            {
-                _execute(parameter);
+            if (Interlocked.Exchange(ref _isRunning, 1) == 1)
                 return;
-            }
 
-            if (_executeAsync != null)
+            RaiseCanExecuteChanged();
+
+            try
             {
-                if (Interlocked.Exchange(ref _isRunning, 1) == 1)
-                    return;
-
+                await _executeAsync(parameter);
+            }
+            finally
+            {
+                Interlocked.Exchange(ref _isRunning, 0);
                 RaiseCanExecuteChanged();
-
-                try
-                {
-                    await _executeAsync(parameter);
-                }
-                finally
-                {
-                    Interlocked.Exchange(ref _isRunning, 0);
-                    RaiseCanExecuteChanged();
-                }
             }
         }
-
-        public void RaiseCanExecuteChanged()
-            => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
     }
+
+    public void RaiseCanExecuteChanged()
+        => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
 }

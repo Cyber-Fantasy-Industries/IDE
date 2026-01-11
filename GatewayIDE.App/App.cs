@@ -1,10 +1,8 @@
 using System;
-using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
-using GatewayIDE.App.ViewModels;
 
 namespace GatewayIDE.App;
 
@@ -14,18 +12,7 @@ public partial class App : Application
 
     public App()
     {
-        AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-        TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
-    }
-
-    public override void Initialize()
-    {
-        // 🔑 DI / AppState / NetworkSession bootstrap
-        AppBootstrap.Init();
-
-        // 👉 ServiceProvider einmal übernehmen
-        Services = AppBootstrap.Services;
-
+        Services = AppBootstrap.BuildServices();
         AvaloniaXamlLoader.Load(this);
     }
 
@@ -35,30 +22,10 @@ public partial class App : Application
         {
             desktop.MainWindow = new MainWindow
             {
-                DataContext = Services.GetRequiredService<MainWindowViewModel>(),
+                DataContext = Services.GetRequiredService<MainState>(),
             };
         }
 
         base.OnFrameworkInitializationCompleted();
-    }
-
-    private static void CurrentDomain_UnhandledException(object? sender, UnhandledExceptionEventArgs e)
-    {
-        try
-        {
-            var msg = "[UNHANDLED] " + (e.ExceptionObject?.ToString() ?? "unknown");
-            System.IO.File.AppendAllText("IDE-crash.log", msg + Environment.NewLine);
-        }
-        catch { /* ignore */ }
-    }
-
-    private static void TaskScheduler_UnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
-    {
-        try
-        {
-            var msg = "[UNOBSERVED] " + e.Exception;
-            System.IO.File.AppendAllText("IDE-crash.log", msg + Environment.NewLine);
-        }
-        catch { /* ignore */ }
     }
 }

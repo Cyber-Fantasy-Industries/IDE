@@ -34,7 +34,7 @@
   <ItemGroup>
     <AvaloniaXaml Include="App.axaml" />
     <AvaloniaXaml Include="MainWindow.axaml" />
-    <AvaloniaXaml Include="Views\MainLayout.axaml" />
+    <AvaloniaXaml Include="Views\Layout.axaml" />
     <AvaloniaXaml Include="Views\LeftRail.axaml" />
     <AvaloniaXaml Include="Views\Chat\SidePanel.axaml" />
     <AvaloniaXaml Include="Views\Docker\DockerPanel.axaml" />

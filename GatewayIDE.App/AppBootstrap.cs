@@ -1,40 +1,44 @@
+// File: GatewayIDE.App/AppBootstrap.cs
 using System;
+
 using Microsoft.Extensions.DependencyInjection;
+
 using GatewayIDE.App.Services.App;
 using GatewayIDE.App.Services.Auth;
 using GatewayIDE.App.Services.Network;
-using GatewayIDE.App.ViewModels;
-using GatewayIDE.App.Views.Network;
+
+// NOTE: DockerService ist statisch -> nicht in DI registrieren
+// using GatewayIDE.App.Services.Processes;
+
 namespace GatewayIDE.App;
 
 public static class AppBootstrap
 {
-    public static IServiceProvider Services { get; private set; } = default!;
-
-    public static void Init()
+    public static IServiceProvider BuildServices()
     {
-        var services = new ServiceCollection();
+        var sc = new ServiceCollection();
 
-        // Globaler State
-        services.AddSingleton<NetworkSession>();
-        services.AddSingleton<AppState>();
+        // -------------------------
+        // Core app services
+        // -------------------------
+        sc.AddSingleton<AppState>();
+        sc.AddSingleton<GatewayIDEConfig>();
+        sc.AddSingleton<SettingsService>();
+        sc.AddSingleton<RegistryService>();
 
-        // Settings
-        services.AddSingleton<SettingsService>();
-        services.AddSingleton(sp => sp.GetRequiredService<SettingsService>().Load());
-        
-        services.AddSingleton<RegistryService>();
+        // Auth / Network
+        sc.AddSingleton<AuthBootstrapService>();
+        sc.AddSingleton<NetworkSession>();
+        sc.AddSingleton<NetworkApiService>();
 
-        // HTTP Services
-        services.AddHttpClient<AuthBootstrapService>();
+        // -------------------------
+        // App state (Composition Root)
+        // -------------------------
+        sc.AddSingleton<MainState>();
 
-        services.AddHttpClient<NetworkApiService>((sp, c) =>
-        {
-            var cfg = sp.GetRequiredService<GatewayIDEConfig>();
-            c.BaseAddress = new Uri(cfg.NetworkApiBaseUrl);
-        });
-        services.AddSingleton<MainWindowViewModel>();
-        services.AddTransient<NetworkPanelViewModel>();
-        Services = services.BuildServiceProvider();
+        // Commands
+        sc.AddSingleton<GatewayIDE.App.Commands.MainCommands>();
+
+        return sc.BuildServiceProvider();
     }
 }
