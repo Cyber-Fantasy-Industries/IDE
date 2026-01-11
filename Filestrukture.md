@@ -31,7 +31,10 @@ GatewayIDE/
 │   │   │   └── DockerService C#
 │   │   └── Network/
 │   │       ├── GithubDeviceFlow C#
-│   │       └── WireGuardKeys C#
+│   │       ├── WireGuardKeys C#
+│   │       ├── NetworkApiService C#
+│   │       ├── NetworkSession C#
+│   │       └── NetworkDtos C#
 │   ├── Views/
 │   │   ├── Chat/
 │   │   │   ├── SidePanel.axaml
@@ -67,8 +70,10 @@ GatewayIDE/
 │   │   │   ├── KiSystemPanel C#
 │   │   │   └── ThreadRouter C#
 │   │   ├── Network/
-│   │   │   ├── NetworkPanel.axaml
-│   │   │   └── NetworkPanel C#
+│   │   │   ├── NetworkPanel.axaml 
+│   │   │   ├── NetworkPanel C#
+│   │   │   ├── NetworkPanelViewModel C#
+│   │   │   └── Simplecommands C#
 │   │   ├── Settings/
 │   │   │   ├── SettingsPanel.axaml
 │   │   │   └── SettingsPanel C#
