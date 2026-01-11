@@ -3,7 +3,7 @@ using System;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace GatewayIDE.App.ViewModels.Network;
+namespace GatewayIDE.App.Views.Network;
 
 public sealed class AsyncCommand : ICommand
 {

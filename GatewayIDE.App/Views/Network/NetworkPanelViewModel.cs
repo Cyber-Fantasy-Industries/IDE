@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using GatewayIDE.App.Services.Network;
 
-namespace GatewayIDE.App.ViewModels.Network;
+namespace GatewayIDE.App.Views.Network;
 
 public sealed class NetworkPanelViewModel : INotifyPropertyChanged
 {
