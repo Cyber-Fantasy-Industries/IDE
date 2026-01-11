@@ -28,8 +28,8 @@ er schafft ausschließlich die **Netzwerk- und Sicherheitsgrundlage**.
 
 Der Schwerpunkt liegt explizit auf dem **Backend**.
 
-* Netzwerklogik liegt unter `backend/network/`
-* Öffentliche und interne API-Schnittstellen liegen unter `backend/routes/`
+* Netzwerklogik liegt unter `Network/network/`
+* Öffentliche und interne API-Schnittstellen liegen unter `Network/routes/`
 * Das Backend fungiert als **Control Plane** zwischen Netzwerk, Authentifizierung und Engines
 
 Die IDE selbst ist in diesem Meilenstein lediglich ein Client des Backends.
