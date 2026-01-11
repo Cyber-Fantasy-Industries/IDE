@@ -21,8 +21,8 @@ public sealed class NetworkApiService
 
     private HttpRequestMessage NewRequest(HttpMethod method, string relativeUrl)
     {
-        if (!_session.IsReady)
-            throw new InvalidOperationException("NetworkSession ist nicht authentifiziert (UserId fehlt).");
+        if (string.IsNullOrWhiteSpace(_session.UserId))
+            throw new InvalidOperationException("UserId fehlt (nicht authentifiziert).");
 
         var req = new HttpRequestMessage(method, relativeUrl);
         req.Headers.TryAddWithoutValidation("x-user-id", _session.UserId);

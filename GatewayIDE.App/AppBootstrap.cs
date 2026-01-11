@@ -3,7 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using GatewayIDE.App.Services.App;
 using GatewayIDE.App.Services.Auth;
 using GatewayIDE.App.Services.Network;
-
+using GatewayIDE.App.ViewModels;
+using GatewayIDE.App.Views.Network;
 namespace GatewayIDE.App;
 
 public static class AppBootstrap
@@ -24,7 +25,8 @@ public static class AppBootstrap
         {
             c.BaseAddress = new Uri("http://localhost:8080/");
         });
-
+        services.AddSingleton<MainWindowViewModel>();
+        services.AddTransient<NetworkPanelViewModel>();
         Services = services.BuildServiceProvider();
     }
 }

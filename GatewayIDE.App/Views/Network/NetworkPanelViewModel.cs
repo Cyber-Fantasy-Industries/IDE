@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using GatewayIDE.App.Services.Network;
+using GatewayIDE.App.Services.App;
 
 namespace GatewayIDE.App.Views.Network;
 
@@ -15,10 +16,14 @@ public sealed class NetworkPanelViewModel : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public NetworkPanelViewModel(NetworkApiService api, NetworkSession session)
+    public NetworkPanelViewModel(NetworkApiService api, NetworkSession session, AppState appState)
     {
         _api = api ?? throw new ArgumentNullException(nameof(api));
         _session = session ?? throw new ArgumentNullException(nameof(session));
+
+        // ✅ wenn Auth reinkommt, Commands neu evaluieren
+        appState.Authenticated += _ => RefreshCanExecutes();
+        appState.LoggedOut += () => RefreshCanExecutes();
 
         RefreshStatusCommand = new AsyncCommand(RefreshStatusAsync, () => _session.IsReady);
         RefreshSelfPeerCommand = new AsyncCommand(RefreshSelfPeerAsync, () => _session.IsReady);
@@ -27,6 +32,7 @@ public sealed class NetworkPanelViewModel : INotifyPropertyChanged
         RefreshPeersCommand = new AsyncCommand(RefreshPeersAsync, () => _session.IsReady && IsAdmin);
         CreateInviteCommand = new AsyncCommand(CreateInviteAsync, () => _session.IsReady && IsAdmin);
     }
+
 
     // ---------- UI Properties ----------
 
@@ -197,4 +203,16 @@ public sealed class NetworkPanelViewModel : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         return true;
     }
+        private void RefreshCanExecutes()
+    {
+        RefreshStatusCommand.RaiseCanExecuteChanged();
+        RefreshSelfPeerCommand.RaiseCanExecuteChanged();
+        EnrollCommand.RaiseCanExecuteChanged();
+        RefreshPeersCommand.RaiseCanExecuteChanged();
+        CreateInviteCommand.RaiseCanExecuteChanged();
+
+        // optional, falls du UI-Elemente an IsAdmin bindest
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsAdmin)));
+    }
+
 }
