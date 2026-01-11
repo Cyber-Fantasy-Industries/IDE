@@ -2,8 +2,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 
              xmlns:views="clr-namespace:GatewayIDE.App.Views"
-             xmlns:docker="clr-namespace:GatewayIDE.App.Views.Docker"
+             
              xmlns:dash="clr-namespace:GatewayIDE.App.Views.Dashboard"
+             xmlns:docker="clr-namespace:GatewayIDE.App.Views.Docker"
              xmlns:explorer="clr-namespace:GatewayIDE.App.Views.Explorer"
              xmlns:engines="clr-namespace:GatewayIDE.App.Views.Engines"
              xmlns:github="clr-namespace:GatewayIDE.App.Views.GitHub"

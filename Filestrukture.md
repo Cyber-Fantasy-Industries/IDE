@@ -6,6 +6,9 @@ GatewayIDE/
 │   │   ├── App/
 │   │   │   ├── GatewayIDEConfig C#
 │   │   │   ├── SettingsService C#
+│   │   │   ├── RegistryService C#
+│   │   │   ├── ServiceRegistryModels C#
+│   │   │   ├── NetworkRegistryModels C#
 │   │   │   └── Appstate.cs
 │   │   ├── Auth/
 │   │   │   └── AuthBootstrapService C#
@@ -55,26 +58,25 @@ GatewayIDE/
 │   │   │   └── ThreadRouter C#
 │   │   ├── Network/
 │   │   │   ├── NetworkPanel.axaml 
-│   │   │   ├── NetworkPanel C#
-│   │   │   └── NetworkPanelViewModel C#
+│   │   │   └── NetworkPanel C#
 │   │   ├── Settings/
 │   │   │   ├── SettingsPanel.axaml
 │   │   │   └── SettingsPanel C#
-│   │   ├── MainWindowViewModel C#
 │   │   ├── LeftRail.axaml
 │   │   ├── LeftRail C#
-│   │   ├── MainLayout.axaml
-│   │   └── MainLayout C#
+│   │   ├── LayoutState C#
+│   │   ├── Layout.axaml
+│   │   └── Layout C#
 │   ├── GatewayIDE.App C#
 │   ├── App.axaml
 │   ├── App C#
-│   ├── MainLayoutState C#
+│   ├── AppBootstrap C#
 │   ├── MainWindow.axaml
 │   ├── MainWindow C#
-│   ├── MainCommands C#
+│   ├── Commands C#
 │   ├── Converters C#
-│   ├── DelegateCommand C#
 │   ├── ViewModelBase C#
+│   ├── MainState C#
 │   └── Program C#
 ├── Network/
 │   ├── __init__

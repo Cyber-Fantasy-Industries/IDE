@@ -22,6 +22,8 @@ public static class AppBootstrap
         // Settings
         services.AddSingleton<SettingsService>();
         services.AddSingleton(sp => sp.GetRequiredService<SettingsService>().Load());
+        
+        services.AddSingleton<RegistryService>();
 
         // HTTP Services
         services.AddHttpClient<AuthBootstrapService>();
