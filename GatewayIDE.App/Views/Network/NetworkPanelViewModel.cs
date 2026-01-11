@@ -20,12 +20,12 @@ public sealed class NetworkPanelViewModel : INotifyPropertyChanged
         _api = api ?? throw new ArgumentNullException(nameof(api));
         _session = session ?? throw new ArgumentNullException(nameof(session));
 
-        RefreshStatusCommand = new AsyncCommand(RefreshStatusAsync, () => _session.IsAuthenticated);
-        RefreshSelfPeerCommand = new AsyncCommand(RefreshSelfPeerAsync, () => _session.IsAuthenticated);
-        EnrollCommand = new AsyncCommand(EnrollAsync, () => _session.IsAuthenticated && !string.IsNullOrWhiteSpace(InviteCode));
+        RefreshStatusCommand = new AsyncCommand(RefreshStatusAsync, () => _session.IsReady);
+        RefreshSelfPeerCommand = new AsyncCommand(RefreshSelfPeerAsync, () => _session.IsReady);
+        EnrollCommand = new AsyncCommand(EnrollAsync, () => _session.IsReady && !string.IsNullOrWhiteSpace(InviteCode));
 
-        RefreshPeersCommand = new AsyncCommand(RefreshPeersAsync, () => _session.IsAuthenticated && IsAdmin);
-        CreateInviteCommand = new AsyncCommand(CreateInviteAsync, () => _session.IsAuthenticated && IsAdmin);
+        RefreshPeersCommand = new AsyncCommand(RefreshPeersAsync, () => _session.IsReady && IsAdmin);
+        CreateInviteCommand = new AsyncCommand(CreateInviteAsync, () => _session.IsReady && IsAdmin);
     }
 
     // ---------- UI Properties ----------

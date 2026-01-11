@@ -21,6 +21,8 @@ GatewayIDE/
 │       └── admin_network.py
 ├── GatewayIDE.App/
 │   ├── Services/
+│   │   │   └── App/
+│   │   │        └── Appstate.cs
 │   │   ├── AI/
 │   │   │   └── AIClientService C#
 │   │   ├── Auth/
@@ -106,6 +108,7 @@ GatewayIDE/
 ├── GatewayIDE.sln
 ├── pyproject.toml
 ├── README.md
+├── AppBootstrap.cs
 └── uv.lock
 
 

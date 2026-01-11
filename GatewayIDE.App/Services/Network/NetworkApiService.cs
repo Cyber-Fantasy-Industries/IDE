@@ -21,7 +21,7 @@ public sealed class NetworkApiService
 
     private HttpRequestMessage NewRequest(HttpMethod method, string relativeUrl)
     {
-        if (!_session.IsAuthenticated)
+        if (!_session.IsReady)
             throw new InvalidOperationException("NetworkSession ist nicht authentifiziert (UserId fehlt).");
 
         var req = new HttpRequestMessage(method, relativeUrl);
@@ -66,8 +66,8 @@ public sealed class NetworkApiService
             ClientPublicKey = _session.WireGuardPublicKey,
             Device = new EnrollDeviceDto
             {
-                DeviceId = _session.DeviceId ?? Environment.MachineName,
-                DeviceName = _session.DeviceName ?? Environment.MachineName
+                DeviceId = Environment.MachineName,
+                DeviceName = Environment.MachineName
             }
         };
 

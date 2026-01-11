@@ -3,20 +3,31 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Microsoft.Extensions.DependencyInjection;
 using GatewayIDE.App.ViewModels;
 
 namespace GatewayIDE.App;
 
 public partial class App : Application
 {
+    public static IServiceProvider Services { get; private set; } = default!;
+
     public App()
     {
-        // Globale Crash-Logger nur EINMAL im Konstruktor registrieren
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
     }
 
-    public override void Initialize() => AvaloniaXamlLoader.Load(this);
+    public override void Initialize()
+    {
+        // 🔑 DI / AppState / NetworkSession bootstrap
+        AppBootstrap.Init();
+
+        // 👉 ServiceProvider einmal übernehmen
+        Services = AppBootstrap.Services;
+
+        AvaloniaXamlLoader.Load(this);
+    }
 
     public override void OnFrameworkInitializationCompleted()
     {
@@ -24,9 +35,10 @@ public partial class App : Application
         {
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainWindowViewModel(),
+                DataContext = Services.GetRequiredService<MainWindowViewModel>(),
             };
         }
+
         base.OnFrameworkInitializationCompleted();
     }
 
