@@ -7,9 +7,6 @@ using GatewayIDE.App.Services.App;
 using GatewayIDE.App.Services.Auth;
 using GatewayIDE.App.Services.Network;
 
-// NOTE: DockerService ist statisch -> nicht in DI registrieren
-// using GatewayIDE.App.Services.Processes;
-
 namespace GatewayIDE.App;
 
 public static class AppBootstrap
@@ -19,17 +16,31 @@ public static class AppBootstrap
         var sc = new ServiceCollection();
 
         // -------------------------
-        // Core app services
+        // Settings / Config
         // -------------------------
-        sc.AddSingleton<AppState>();
-        sc.AddSingleton<GatewayIDEConfig>();
         sc.AddSingleton<SettingsService>();
+
+        // Config wird aus settings.json geladen (inkl. ENV override GATEWAY_NETWORK_API)
+        sc.AddSingleton(sp => sp.GetRequiredService<SettingsService>().Load());
+
+        // Registry basiert auf Config
         sc.AddSingleton<RegistryService>();
 
-        // Auth / Network
-        sc.AddSingleton<AuthBootstrapService>();
+        // -------------------------
+        // Network / Auth Core
+        // -------------------------
         sc.AddSingleton<NetworkSession>();
-        sc.AddSingleton<NetworkApiService>();
+        sc.AddSingleton<AppState>();
+
+        // AuthBootstrap braucht HttpClient (für GitHub device flow)
+        sc.AddHttpClient<AuthBootstrapService>();
+
+        // NetworkApiService braucht HttpClient + BaseAddress aus Config
+        sc.AddHttpClient<NetworkApiService>((sp, http) =>
+        {
+            var cfg = sp.GetRequiredService<GatewayIDEConfig>();
+            http.BaseAddress = new Uri(cfg.NetworkApiBaseUrl);
+        });
 
         // -------------------------
         // App state (Composition Root)
@@ -38,6 +49,9 @@ public static class AppBootstrap
 
         // Commands
         sc.AddSingleton<GatewayIDE.App.Commands.MainCommands>();
+
+        // Views / VMs
+        sc.AddSingleton<GatewayIDE.App.Views.Network.NetworkPanelViewModel>();
 
         return sc.BuildServiceProvider();
     }
