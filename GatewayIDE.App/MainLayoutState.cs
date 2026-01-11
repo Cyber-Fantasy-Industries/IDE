@@ -17,7 +17,7 @@ public sealed class MainLayoutState : ViewModelBase
     public const string TAB_SETTINGS = "Settings";
 
     // Default: Docker
-    private string _activeTab = TAB_DOCK;
+    private string _activeTab = TAB_DASH;
     public string ActiveTab
     {
         get => _activeTab;

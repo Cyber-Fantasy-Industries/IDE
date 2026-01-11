@@ -1,30 +1,12 @@
 # Filestrukture.md
 
 GatewayIDE/
-├── Network/
-│   ├── __init__
-│   ├── main.py
-│   ├── bootstrap.py
-│   ├── pyproject.toml
-│   ├── uv.lock
-│   ├── network/
-│   │   ├── __init__
-│   │   ├── models.py
-│   │   ├── nebula.py
-│   │   ├── README
-│   │   ├── root
-│   │   ├── store.py
-│   │   └── wireguard.py
-│   └── routes/
-│       ├── __init__
-│       ├── network.py
-│       └── admin_network.py
 ├── GatewayIDE.App/
 │   ├── Services/
-│   │   │   └── App/
-│   │   │        └── Appstate.cs
-│   │   ├── AI/
-│   │   │   └── AIClientService C#
+│   │   ├── App/
+│   │   │   ├── GatewayIDEConfig C#
+│   │   │   ├── SettingsService C#
+│   │   │   └── Appstate.cs
 │   │   ├── Auth/
 │   │   │   └── AuthBootstrapService C#
 │   │   ├── Chat/
@@ -74,8 +56,7 @@ GatewayIDE/
 │   │   ├── Network/
 │   │   │   ├── NetworkPanel.axaml 
 │   │   │   ├── NetworkPanel C#
-│   │   │   ├── NetworkPanelViewModel C#
-│   │   │   └── Simplecommands C#
+│   │   │   └── NetworkPanelViewModel C#
 │   │   ├── Settings/
 │   │   │   ├── SettingsPanel.axaml
 │   │   │   └── SettingsPanel C#
@@ -95,11 +76,28 @@ GatewayIDE/
 │   ├── DelegateCommand C#
 │   ├── ViewModelBase C#
 │   └── Program C#
+├── Network/
+│   ├── __init__
+│   ├── main.py
+│   ├── bootstrap.py
+│   ├── pyproject.toml
+│   ├── uv.lock
+│   ├── network/
+│   │   ├── __init__
+│   │   ├── models.py
+│   │   ├── nebula.py
+│   │   ├── README
+│   │   ├── root
+│   │   ├── store.py
+│   │   └── wireguard.py
+│   └── routes/
+│       ├── __init__
+│       ├── network.py
+│       └── admin_network.py
 ├── .dockerignore
 ├── .gitattributes
 ├── .gitignore
 ├── build-win.bat
-├── dev.env
 ├── dev.env
 ├── net.dev.env
 ├── net.prod.env

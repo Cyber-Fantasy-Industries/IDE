@@ -31,7 +31,14 @@ public sealed class DelegateCommand : ICommand
         _canExecute = canExecute;
     }
 
-    public bool CanExecute(object? parameter) => _canExecute?.Invoke(parameter) ?? true;
+    public bool CanExecute(object? parameter)
+    {
+        // If this is an async command, disable while running (prevents double click spam)
+        if (_executeAsync != null && System.Threading.Volatile.Read(ref _isRunning) == 1)
+            return false;
+
+        return _canExecute?.Invoke(parameter) ?? true;
+    }
 
     public async void Execute(object? parameter)
     {
@@ -49,16 +56,21 @@ public sealed class DelegateCommand : ICommand
             if (System.Threading.Interlocked.Exchange(ref _isRunning, 1) == 1)
                 return;
 
-            try { await _executeAsync(parameter); }
+            RaiseCanExecuteChanged();
+
+            try
+            {
+                await _executeAsync(parameter);
+            }
             catch
             {
                 // bewusst: keine UI-Dependencies hier.
-                // Fehler laufen als Exceptions im Debugger auf, oder werden im jeweiligen Service geloggt.
                 throw;
             }
             finally
             {
                 System.Threading.Interlocked.Exchange(ref _isRunning, 0);
+                RaiseCanExecuteChanged();
             }
         }
     }

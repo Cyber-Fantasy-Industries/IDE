@@ -100,6 +100,7 @@ def peer_self(
 @router.post("/enroll", response_model=EnrollmentResponse)
 def enroll(
     payload: EnrollmentRequest,
+    _: None = Depends(require_trusted_network),  
     user_id: str = Depends(get_current_user_id),
     wg: WireGuardManager = Depends(get_wg_manager),
 ):

@@ -19,11 +19,17 @@ public static class AppBootstrap
         services.AddSingleton<NetworkSession>();
         services.AddSingleton<AppState>();
 
+        // Settings
+        services.AddSingleton<SettingsService>();
+        services.AddSingleton(sp => sp.GetRequiredService<SettingsService>().Load());
+
         // HTTP Services
         services.AddHttpClient<AuthBootstrapService>();
-        services.AddHttpClient<NetworkApiService>(c =>
+
+        services.AddHttpClient<NetworkApiService>((sp, c) =>
         {
-            c.BaseAddress = new Uri("http://localhost:8080/");
+            var cfg = sp.GetRequiredService<GatewayIDEConfig>();
+            c.BaseAddress = new Uri(cfg.NetworkApiBaseUrl);
         });
         services.AddSingleton<MainWindowViewModel>();
         services.AddTransient<NetworkPanelViewModel>();
