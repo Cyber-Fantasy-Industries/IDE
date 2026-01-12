@@ -1,7 +1,6 @@
 name: IDE
 services:
   network:
-    container_name: network-container
     build:
       context: .
       dockerfile: Dockerfile.network

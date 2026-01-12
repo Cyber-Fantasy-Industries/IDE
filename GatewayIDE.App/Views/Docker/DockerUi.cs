@@ -17,21 +17,16 @@ public sealed class DockerUi
         {
             new ServiceUnitVm(new UnitConfig
             {
-                Id = "leona",
-                DisplayName = "LEONA",
-                ComposeFile = "docker-compose.yml",
-                ProjectName = "gateway-leona",
-                ServiceName = "leona",
-                ContainerName = "leona-container"
-            }),
-            new ServiceUnitVm(new UnitConfig
-            {
                 Id = "network",
                 DisplayName = "NETWORK",
                 ComposeFile = "docker-compose.yml",
                 ProjectName = "gateway-network",
+
                 ServiceName = "network",
-                ContainerName = "network-container"
+                ContainerName = "network-container",
+
+                DevServiceName = "network-dev",
+                DevContainerName = "network-dev-container"
             })
         });
     }

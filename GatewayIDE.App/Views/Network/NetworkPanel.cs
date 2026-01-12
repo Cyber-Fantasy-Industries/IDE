@@ -67,6 +67,18 @@ public sealed class NetworkPanelViewModel : INotifyPropertyChanged
 
         RefreshPeersCommand = new AsyncCommand(async _ => await RefreshPeersAsync(), _ => _session.IsReady && IsAdmin);
         CreateInviteCommand = new AsyncCommand(async _ => await CreateInviteAsync(), _ => _session.IsReady && IsAdmin);
+
+        // ✅ DEV Auth: damit du UI/Commands testen kannst, ohne GitHub-Flow fertig zu haben
+        DevAuthCommand = new AsyncCommand(_ =>
+        {
+        _session.ApplyAuth("debug", "DEV_PUBLIC_KEY", UserRole.Owner);
+        // _session.ApplyAuth(githubUserId: "debug", wireGuardPublicKey: "DEV_PUBLIC_KEY", role: UserRole.Owner);
+
+
+            AppendLog("✅ DEV Auth gesetzt (debug / owner)");
+            RefreshCanExecutes();
+            return Task.CompletedTask;
+        }, _ => true);
     }
 
     // ---------- UI Properties ----------
@@ -109,6 +121,7 @@ public sealed class NetworkPanelViewModel : INotifyPropertyChanged
 
     public AsyncCommand RefreshPeersCommand { get; }
     public AsyncCommand CreateInviteCommand { get; }
+    public AsyncCommand DevAuthCommand { get; }
 
     // ---------- Command Methods ----------
 
@@ -225,6 +238,7 @@ public sealed class NetworkPanelViewModel : INotifyPropertyChanged
         EnrollCommand.RaiseCanExecuteChanged();
         RefreshPeersCommand.RaiseCanExecuteChanged();
         CreateInviteCommand.RaiseCanExecuteChanged();
+        DevAuthCommand.RaiseCanExecuteChanged();
 
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsAdmin)));
     }

@@ -8,9 +8,16 @@ public sealed class UnitConfig
     public string ComposeFile { get; init; } = "docker-compose.yml";
     public string ProjectName { get; init; } = "";
 
-    // docker compose service name
+    // PROD
     public string ServiceName { get; init; } = "";
-
-    // docker container name (for exec)
     public string ContainerName { get; init; } = "";
+
+    // DEV (optional)
+    public string? DevServiceName { get; init; }
+    public string? DevContainerName { get; init; }
+
+    // Compose profile (optional) – z.B. "dev"
+    public string? ComposeProfile { get; init; }
+
+    public bool HasDevMode => !string.IsNullOrWhiteSpace(DevServiceName);
 }

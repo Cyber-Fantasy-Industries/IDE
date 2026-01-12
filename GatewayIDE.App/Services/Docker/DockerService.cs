@@ -147,7 +147,6 @@ namespace GatewayIDE.App.Services.Processes
         // ----------------------------
         // Compose helpers
         // ----------------------------
-
         // Legacy compose (global)
         private static Task<int> ComposeAsync(
             string args,
@@ -156,7 +155,7 @@ namespace GatewayIDE.App.Services.Processes
             CancellationToken ct = default)
             => RunAsync("docker", $"compose -f \"{ComposePath()}\" {args}", o, e, ct);
 
-        // ✅ Unit compose: -f + -p + args + (optional service)
+        // ✅ Unit compose: -f + (optional --profile) + -p + args + (optional service)
         private static Task<int> ComposeUnitAsync(
             GatewayIDE.App.ViewModels.UnitConfig u,
             string argsWithoutService,
@@ -171,7 +170,12 @@ namespace GatewayIDE.App.Services.Processes
             var project = string.IsNullOrWhiteSpace(u.ProjectName) ? $"gateway-{u.Id}" : u.ProjectName.Trim();
             var service = u.ServiceName?.Trim() ?? "";
 
-            var args = $"compose -f \"{composeFile}\" -p \"{project}\" {argsWithoutService}";
+            // ✅ NEW: optional compose profile (e.g. "dev")
+            var profileArg = string.IsNullOrWhiteSpace(u.ComposeProfile)
+                ? ""
+                : $" --profile \"{u.ComposeProfile.Trim()}\"";
+
+            var args = $"compose -f \"{composeFile}\"{profileArg} -p \"{project}\" {argsWithoutService}";
             if (appendServiceName && !string.IsNullOrWhiteSpace(service))
                 args += $" {service}";
 
@@ -180,6 +184,7 @@ namespace GatewayIDE.App.Services.Processes
 
         private static string EscapeForBash(string s)
             => (s ?? "").Replace("\"", "\\\"");
+
 
         // ----------------------------
         // Status (Host + Container)

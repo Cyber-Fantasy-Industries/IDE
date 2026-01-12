@@ -5,9 +5,7 @@
   <Grid RowDefinitions="Auto,Auto,*,Auto"
         Background="#0f0f0f">
 
-    <!-- ========================= -->
-    <!-- TOP: CONNECT + HOST        -->
-    <!-- ========================= -->
+    <!-- TOP: CONNECT + HOST -->
     <Grid Grid.Row="0"
           ColumnDefinitions="*,*"
           Margin="16,16,16,0">
@@ -27,7 +25,6 @@
           <TextBlock Text="Paste invite code or network address."
                      Opacity="0.75"/>
 
-          <!-- ✅ InviteCode -> VM -->
           <TextBox Watermark="Invite Code / Address"
                    Margin="0,4,0,0"
                    Text="{Binding InviteCode, Mode=TwoWay}"/>
@@ -35,37 +32,34 @@
           <Grid ColumnDefinitions="*,*">
             <StackPanel Grid.Column="0" Spacing="6" Margin="0,0,6,0">
               <TextBlock Text="Username" Opacity="0.75"/>
-              <!-- (noch nicht verdrahtet; kommt später in Registry/Profile) -->
               <TextBox Watermark="username"/>
             </StackPanel>
 
             <StackPanel Grid.Column="1" Spacing="6" Margin="6,0,0,0">
               <TextBlock Text="Device ID" Opacity="0.75"/>
-              <!-- (noch nicht verdrahtet; DeviceId wird aktuell automatisch gesetzt) -->
               <TextBox Watermark="clientname (devbox-1)"/>
             </StackPanel>
           </Grid>
 
           <StackPanel Orientation="Horizontal" Spacing="8">
-            <!-- ✅ Join -> EnrollCommand -->
             <Button Content="Join"
                     MinWidth="120"
                     Command="{Binding EnrollCommand}"/>
 
-            <!-- ✅ Status testen -->
             <Button Content="Refresh Status"
                     MinWidth="140"
                     Command="{Binding RefreshStatusCommand}"/>
 
-            <TextBlock Text="Client key is generated automatically after GitHub auth."
-                       Opacity="0.55"
-                       VerticalAlignment="Center"/>
+            <Button Content="DEV Auth"
+                    MinWidth="120"
+                    Command="{Binding DevAuthCommand}"/>
           </StackPanel>
 
-          <!-- ✅ StatusText sichtbar -->
           <TextBlock Text="{Binding StatusText}"
                      Opacity="0.85"/>
 
+          <TextBlock Text="Client key is generated automatically after GitHub auth."
+                     Opacity="0.55"/>
         </StackPanel>
       </Border>
 
@@ -120,7 +114,7 @@
             </StackPanel>
           </Grid>
 
-          <!-- ✅ Admin Invite-Flow ist bereits implementiert -> hier direkt testbar -->
+          <!-- Admin actions -->
           <StackPanel Orientation="Horizontal" Spacing="8">
             <TextBox Width="200"
                      Watermark="invite label"
@@ -137,11 +131,9 @@
           </StackPanel>
 
           <StackPanel Orientation="Horizontal" Spacing="8">
-            <!-- Host ist noch nicht implementiert -->
             <Button Content="Host"
                     MinWidth="120"
                     IsEnabled="False"/>
-
             <Button Content="Preview ENV"
                     IsEnabled="False"/>
           </StackPanel>
@@ -151,9 +143,7 @@
 
     </Grid>
 
-    <!-- ========================= -->
-    <!-- SECTION TITLES             -->
-    <!-- ========================= -->
+    <!-- SECTION TITLES -->
     <Grid Grid.Row="1"
           ColumnDefinitions="*,*"
           Margin="16,16,16,0">
@@ -171,128 +161,38 @@
                  Margin="8,0,0,0"/>
     </Grid>
 
-    <!-- ========================= -->
-    <!-- MIDDLE: LISTS              -->
-    <!-- ========================= -->
+    <!-- MIDDLE: LISTS -->
     <Grid Grid.Row="2"
           ColumnDefinitions="*,*"
           Margin="16,10,16,0">
 
-      <!-- CONNECTED NETWORKS (left) -->
       <Border Grid.Column="0"
               Margin="0,0,8,0"
               Background="#1b1e23"
               CornerRadius="10"
               Padding="12">
-
         <StackPanel Spacing="10">
-
           <TextBox Watermark="Search connected networks…"/>
-
-          <!-- Placeholder list (kommt später aus RegistryService.ConnectedNetworks) -->
-          <ItemsControl>
-            <ItemsControl.ItemTemplate>
-              <DataTemplate>
-                <Border Background="#252932"
-                        CornerRadius="8"
-                        Padding="10"
-                        Margin="0,6,0,0">
-                  <Grid ColumnDefinitions="*,Auto,Auto,Auto"
-                        RowDefinitions="Auto,Auto">
-                    <TextBlock Grid.Row="0" Grid.Column="0"
-                               Text="MyTeamNet"
-                               FontSize="15"
-                               FontWeight="SemiBold"/>
-
-                    <TextBlock Grid.Row="0" Grid.Column="1"
-                               Text="● Online"
-                               Foreground="LightGreen"
-                               Margin="12,0,0,0"/>
-
-                    <Button Grid.Row="0" Grid.Column="2"
-                            Content="Details"
-                            Margin="12,0,0,0"/>
-                    <Button Grid.Row="0" Grid.Column="3"
-                            Content="Disconnect"
-                            Margin="8,0,0,0"/>
-
-                    <TextBlock Grid.Row="1" Grid.Column="0"
-                               Text="Last seen: just now • Overlay: 10.77.0.23"
-                               Opacity="0.65"
-                               Margin="0,4,0,0"/>
-                  </Grid>
-                </Border>
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
-
+          <TextBlock Text="(Placeholder – kommt später aus RegistryService)"
+                     Opacity="0.6"/>
         </StackPanel>
-
       </Border>
 
-      <!-- HOSTED NETWORKS (right) -->
       <Border Grid.Column="1"
               Margin="8,0,0,0"
               Background="#1b1e23"
               CornerRadius="10"
               Padding="12">
-
         <StackPanel Spacing="10">
-
           <TextBox Watermark="Search hosted networks…"/>
-
-          <!-- Placeholder list -->
-          <ItemsControl>
-            <ItemsControl.ItemTemplate>
-              <DataTemplate>
-                <Border Background="#252932"
-                        CornerRadius="8"
-                        Padding="10"
-                        Margin="0,6,0,0">
-                  <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto"
-                        RowDefinitions="Auto,Auto">
-
-                    <TextBlock Grid.Row="0" Grid.Column="0"
-                               Text="MyTeamNet"
-                               FontSize="15"
-                               FontWeight="SemiBold"/>
-
-                    <TextBlock Grid.Row="0" Grid.Column="1"
-                               Text="● Online"
-                               Foreground="LightGreen"
-                               Margin="12,0,0,0"/>
-
-                    <Button Grid.Row="0" Grid.Column="2"
-                            Content="Settings"
-                            Margin="12,0,0,0"/>
-
-                    <Button Grid.Row="0" Grid.Column="3"
-                            Content="Create Invite"
-                            Margin="8,0,0,0"/>
-
-                    <Button Grid.Row="0" Grid.Column="4"
-                            Content="View Connections"
-                            Margin="8,0,0,0"/>
-
-                    <TextBlock Grid.Row="1" Grid.Column="0"
-                               Text="Peers: 4 connected • Subnet: 10.77.0.0/16"
-                               Opacity="0.65"
-                               Margin="0,4,0,0"/>
-                  </Grid>
-                </Border>
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
-
+          <TextBlock Text="(Placeholder – kommt später aus RegistryService)"
+                     Opacity="0.6"/>
         </StackPanel>
-
       </Border>
 
     </Grid>
 
-    <!-- ========================= -->
-    <!-- BOTTOM: VIEWPANEL          -->
-    <!-- ========================= -->
+    <!-- BOTTOM: VIEWPANEL -->
     <Border Grid.Row="3"
             Margin="16,16,16,16"
             Background="#1b1e23"
@@ -307,7 +207,6 @@
                    FontSize="16"
                    FontWeight="Bold"/>
 
-        <!-- ✅ Admin Peers laden (sichtbarer Test-Button) -->
         <Button Grid.Row="0" Grid.Column="1"
                 Content="Refresh Peers"
                 Command="{Binding RefreshPeersCommand}"/>
@@ -318,9 +217,8 @@
                 Padding="12"
                 Margin="0,10,0,0">
 
-          <Grid RowDefinitions="Auto,Auto,*" ColumnDefinitions="*">
+          <Grid RowDefinitions="Auto,Auto,*">
 
-            <!-- ✅ Log-Ausgabe aus VM -->
             <TextBlock Text="Log"
                        FontWeight="Bold"
                        Opacity="0.85"/>
@@ -333,7 +231,6 @@
                      Background="#1b1e23"
                      Margin="0,8,0,0"/>
 
-            <!-- ✅ Peers Liste (nur sinnvoll wenn Admin/Owner) -->
             <ItemsControl Grid.Row="2"
                           Margin="0,10,0,0"
                           ItemsSource="{Binding Peers}">
@@ -362,5 +259,4 @@
     </Border>
 
   </Grid>
-
 </UserControl>

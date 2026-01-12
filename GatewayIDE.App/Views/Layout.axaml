@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 
              xmlns:views="clr-namespace:GatewayIDE.App.Views"
-             
+
              xmlns:dash="clr-namespace:GatewayIDE.App.Views.Dashboard"
              xmlns:docker="clr-namespace:GatewayIDE.App.Views.Docker"
              xmlns:explorer="clr-namespace:GatewayIDE.App.Views.Explorer"
@@ -22,35 +22,33 @@
     <!-- LeftRail -->
     <views:LeftRail Grid.Column="0"/>
 
+    <!-- SidePanel (wenn du es wieder anzeigen willst) -->
+    <chat:SidePanel Grid.Column="1"/>
+
     <!-- Workspace -->
     <Grid Grid.Column="2">
 
-      <!-- Dashboard -->
-      <dash:DashboardPanel IsVisible="{Binding Layout.IsDashboard}" />
+      <!-- WICHTIG: kein ContentControl -> Grid erlaubt mehrere Children -->
+      <net:NetworkPanel
+          IsVisible="{Binding Layout.IsNetwork}" />
 
-      <!-- VS / Explorer -->
-      <explorer:ExplorerPanel IsVisible="{Binding Layout.IsExplorer}" />
+      <docker:DockerPanel
+          IsVisible="{Binding Layout.IsDocker}" />
 
-      <!-- Engines -->
-      <engines:EnginesPanel IsVisible="{Binding Layout.IsEngines}" />
+      <dash:DashboardPanel
+          IsVisible="{Binding Layout.IsDashboard}" />
 
-      <!-- GitHub -->
-      <github:GitHubPanel IsVisible="{Binding Layout.IsGitHub}" />
+      <engines:EnginesPanel
+          IsVisible="{Binding Layout.IsEngines}" />
 
-      <!-- Network -->
-      <net:NetworkPanel IsVisible="{Binding Layout.IsNetwork}" />
+      <explorer:ExplorerPanel
+          IsVisible="{Binding Layout.IsExplorer}" />
 
-      <!-- Docker -->
-      <docker:DockerPanel IsVisible="{Binding Layout.IsDocker}" />
+      <github:GitHubPanel
+          IsVisible="{Binding Layout.IsGitHub}" />
 
-      <!-- KI System -->
-      <ki:KiSystemPanel IsVisible="{Binding Layout.IsKiSystem}" />
-
-      <!-- Settings -->
-      <settings:SettingsPanel IsVisible="{Binding Layout.IsSettings}" />
-
-      <!-- Chat -->
-      <chat:SidePanel IsVisible="{Binding Layout.IsChat}" />
+      <settings:SettingsPanel
+          IsVisible="{Binding Layout.IsSettings}" />
 
     </Grid>
   </Grid>

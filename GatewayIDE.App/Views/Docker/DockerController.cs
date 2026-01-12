@@ -43,6 +43,27 @@ public sealed class DockerController : ViewModelBase
         _units.SelectedUnit ?? throw new InvalidOperationException("No unit selected.");
 
     private UnitConfig SelectedConfig => SelectedUnit.Config;
+
+    // „effektive“ Config abhängig vom Toggle
+    private UnitConfig EffectiveConfig => new UnitConfig
+    {
+        Id = SelectedUnit.Config.Id,
+        DisplayName = SelectedUnit.Config.DisplayName,
+        ComposeFile = SelectedUnit.Config.ComposeFile,
+        ProjectName = SelectedUnit.Config.ProjectName,
+
+        ServiceName = SelectedUnit.ActiveServiceName,
+        ContainerName = SelectedUnit.ActiveContainerName,
+
+        // wichtig: profile dev nur wenn IsDev
+        ComposeProfile = SelectedUnit.IsDev ? "dev" : null,
+
+
+        // optional: dev-Felder weiterreichen (nicht zwingend)
+        DevServiceName = SelectedUnit.Config.DevServiceName,
+        DevContainerName = SelectedUnit.Config.DevContainerName
+    };
+
     private DockerLogs SelectedLogs => SelectedUnit.Logs;
     private void OnSelectedUnitChanged()
     {
@@ -106,7 +127,8 @@ public sealed class DockerController : ViewModelBase
             // Falls währenddessen Unit gewechselt wurde: abbrechen
             if (epoch != _selectionEpoch) return;
 
-            var st = await DockerService.GetUnitStatusAsync(SelectedConfig).ConfigureAwait(false);
+            var st = await DockerService.GetUnitStatusAsync(EffectiveConfig).ConfigureAwait(false);
+
 
             if (epoch != _selectionEpoch) return;
 
@@ -131,7 +153,7 @@ public sealed class DockerController : ViewModelBase
     {
         SetUnitStatus(UnitStatus.Starting);
 
-        await DockerService.UnitUpAsync(SelectedConfig, SelectedLogs.AppendDockerOut, SelectedLogs.AppendDockerErr)
+        await DockerService.UnitUpAsync(EffectiveConfig, SelectedLogs.AppendDockerOut, SelectedLogs.AppendDockerErr)
             .ConfigureAwait(false);
 
         StartTailLogs();
@@ -143,7 +165,8 @@ public sealed class DockerController : ViewModelBase
         SetUnitStatus(UnitStatus.Down);
 
         StopTailLogs();
-        await DockerService.UnitStopAsync(SelectedConfig, SelectedLogs.AppendDockerOut, SelectedLogs.AppendDockerErr)
+        await DockerService.UnitStopAsync(EffectiveConfig, SelectedLogs.AppendDockerOut, SelectedLogs.AppendDockerErr)
+
             .ConfigureAwait(false);
 
         await RefreshSystemStatusAsync().ConfigureAwait(false);
@@ -152,7 +175,7 @@ public sealed class DockerController : ViewModelBase
     public async Task UnitDownAsync()
     {
         StopTailLogs();
-        await DockerService.UnitDownAsync(SelectedConfig, SelectedLogs.AppendDockerOut, SelectedLogs.AppendDockerErr)
+        await DockerService.UnitDownAsync(EffectiveConfig, SelectedLogs.AppendDockerOut, SelectedLogs.AppendDockerErr)
             .ConfigureAwait(false);
 
         await RefreshSystemStatusAsync().ConfigureAwait(false);
@@ -162,7 +185,8 @@ public sealed class DockerController : ViewModelBase
     {
         SetUnitStatus(UnitStatus.Restarting);
 
-        await DockerService.UnitRestartAsync(SelectedConfig, SelectedLogs.AppendDockerOut, SelectedLogs.AppendDockerErr)
+        await DockerService.UnitRestartAsync(EffectiveConfig, SelectedLogs.AppendDockerOut, SelectedLogs.AppendDockerErr)
+
             .ConfigureAwait(false);
 
         StartTailLogs();
@@ -173,9 +197,10 @@ public sealed class DockerController : ViewModelBase
     {
         try
         {
-            SelectedLogs.AppendDockerOut($"[REMOVE] Entferne Container für {SelectedConfig.DisplayName} …{Environment.NewLine}");
+            SelectedLogs.AppendDockerOut($"[REMOVE] Entferne Container für {EffectiveConfig.DisplayName} …{Environment.NewLine}");
 
-            await DockerService.UnitRemoveContainerAsync(SelectedConfig, SelectedLogs.AppendDockerOut, SelectedLogs.AppendDockerErr)
+            await DockerService.UnitRemoveContainerAsync(EffectiveConfig, SelectedLogs.AppendDockerOut, SelectedLogs.AppendDockerErr)
+
                 .ConfigureAwait(false);
 
             await RefreshSystemStatusAsync().ConfigureAwait(false);
@@ -197,7 +222,8 @@ public sealed class DockerController : ViewModelBase
             SelectedUnit.Runtime.LastError = null;
             SelectedLogs.ClearAll();
 
-            await DockerService.UnitFullRebuildAsync(SelectedConfig, SelectedLogs.AppendDockerOut, SelectedLogs.AppendDockerErr)
+            await DockerService.UnitFullRebuildAsync(EffectiveConfig, SelectedLogs.AppendDockerOut, SelectedLogs.AppendDockerErr)
+
                 .ConfigureAwait(false);
 
             var banner =
@@ -227,7 +253,7 @@ public sealed class DockerController : ViewModelBase
         SelectedLogs.AppendContainerIO($"> {cmd}{Environment.NewLine}");
 
         await DockerService.UnitExecAsync(
-            SelectedConfig,
+            EffectiveConfig,
             cmd,
             o => SelectedLogs.AppendContainerIO(o),
             e => SelectedLogs.AppendContainerIO(e)
@@ -245,7 +271,7 @@ public sealed class DockerController : ViewModelBase
         _tailCts = new CancellationTokenSource();
 
         _ = DockerService.UnitTailLogsAsync(
-            SelectedConfig,
+            EffectiveConfig,
             SelectedLogs.AppendGateway,
             SelectedLogs.AppendGateway,
             _tailCts.Token

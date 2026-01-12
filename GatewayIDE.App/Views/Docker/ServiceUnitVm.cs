@@ -46,4 +46,30 @@ public sealed class ServiceUnitVm : ViewModelBase
             Raise(nameof(StatusBrush));
         };
     }
+
+    public bool HasDevMode => Config.HasDevMode;
+    public string? ActiveComposeProfile => IsDev ? "dev" : null;
+
+    public bool IsDev
+    {
+        get => Runtime.Mode == UnitMode.Dev;
+        set
+        {
+            Runtime.Mode = value ? UnitMode.Dev : UnitMode.Prod;
+            Raise(nameof(IsDev));
+            Raise(nameof(ActiveServiceName));
+            Raise(nameof(ActiveContainerName));
+        }
+    }
+
+    public string ActiveServiceName =>
+        IsDev && !string.IsNullOrWhiteSpace(Config.DevServiceName)
+            ? Config.DevServiceName!
+            : Config.ServiceName;
+
+    public string ActiveContainerName =>
+        IsDev && !string.IsNullOrWhiteSpace(Config.DevContainerName)
+            ? Config.DevContainerName!
+            : Config.ContainerName;
+
 }
