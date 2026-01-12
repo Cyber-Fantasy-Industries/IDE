@@ -1,6 +1,6 @@
 using Avalonia.Media;
 
-namespace GatewayIDE.App.ViewModels;
+namespace GatewayIDE.App.Views.Docker;
 
 public sealed class ServiceUnitVm : ViewModelBase
 {

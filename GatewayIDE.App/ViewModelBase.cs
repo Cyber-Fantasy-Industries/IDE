@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Avalonia.Threading;
-namespace GatewayIDE.App.ViewModels;
+namespace GatewayIDE.App;
 
 public abstract class ViewModelBase : INotifyPropertyChanged
 {

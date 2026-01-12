@@ -18,6 +18,10 @@ public sealed class NetworkStatusDto
 
     [JsonPropertyName("peer_seen_at")]
     public string? PeerSeenAt { get; set; }
+
+    // ✅ Damit NetworkPanel.cs dto.Status benutzen kann
+    [JsonIgnore]
+    public string Status => Connected ? "Connected" : "Disconnected";
 }
 
 

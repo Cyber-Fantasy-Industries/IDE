@@ -1,4 +1,4 @@
-namespace GatewayIDE.App.ViewModels;
+namespace GatewayIDE.App.Views.Docker;
 
 public enum UnitStatus
 {
