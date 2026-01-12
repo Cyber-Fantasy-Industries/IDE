@@ -14,7 +14,7 @@ GatewayIDE/
 │   │   │   └── AuthBootstrapService C#
 │   │   ├── Chat/
 │   │   │   └── ChatService C#
-│   │   ├── Processes/
+│   │   ├── Docker/
 │   │   │   └── DockerService C#
 │   │   └── Network/
 │   │       ├── GithubDeviceFlow C#

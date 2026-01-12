@@ -167,8 +167,12 @@ namespace GatewayIDE.App.Services.Processes
             if (u == null) throw new ArgumentNullException(nameof(u));
 
             var composeFile = string.IsNullOrWhiteSpace(u.ComposeFile) ? ComposePath() : u.ComposeFile.Trim();
-            var project = string.IsNullOrWhiteSpace(u.ProjectName) ? $"gateway-{u.Id}" : u.ProjectName.Trim();
-            var service = u.ServiceName?.Trim() ?? "";
+            var projectArg = string.IsNullOrWhiteSpace(u.ProjectName)
+                ? ""                                  // ✅ KEIN -p erzwingen
+                : $" -p \"{u.ProjectName.Trim()}\"";  // ✅ nur wenn explizit gesetzt
+
+            var args = $"compose -f \"{composeFile}\"{profileArg}{projectArg} {argsWithoutService}";
+                        var service = u.ServiceName?.Trim() ?? "";
 
             // ✅ NEW: optional compose profile (e.g. "dev")
             var profileArg = string.IsNullOrWhiteSpace(u.ComposeProfile)

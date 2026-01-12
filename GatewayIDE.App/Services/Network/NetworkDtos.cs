@@ -7,12 +7,19 @@ namespace GatewayIDE.App.Services.Network;
 
 public sealed class NetworkStatusDto
 {
-    public string? Status { get; set; }
-    public string? Message { get; set; }
+    [JsonPropertyName("connected")]
+    public bool Connected { get; set; }
 
-    // Optional: falls euer Backend mehr Felder zurückgibt.
-    public Dictionary<string, object>? Meta { get; set; }
+    [JsonPropertyName("server_endpoint")]
+    public string? ServerEndpoint { get; set; }
+
+    [JsonPropertyName("overlay_ip")]
+    public string? OverlayIp { get; set; }
+
+    [JsonPropertyName("peer_seen_at")]
+    public string? PeerSeenAt { get; set; }
 }
+
 
 public sealed class PeerSelfDto
 {
