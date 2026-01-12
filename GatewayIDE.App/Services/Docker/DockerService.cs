@@ -155,6 +155,108 @@ namespace GatewayIDE.App.Services.Processes
             CancellationToken ct = default)
             => RunAsync("docker", $"compose -f \"{ComposePath()}\" {args}", o, e, ct);
 
+        // ✅ ADD: compose up -d <service> mit env-file (Compose v2: --env-file)
+        // docker compose --env-file "<envFile>" -f "<compose>" up -d <service>
+        public static Task<int> ComposeUpWithEnvFileAsync(
+            string envFile,
+            string serviceName,
+            Action<string>? o = null,
+            Action<string>? e = null,
+            CancellationToken ct = default)
+        {
+            if (string.IsNullOrWhiteSpace(serviceName))
+                throw new ArgumentException("serviceName fehlt.", nameof(serviceName));
+
+            // Kein env-file? -> normales compose up
+            if (string.IsNullOrWhiteSpace(envFile))
+                return ComposeAsync($"up -d {serviceName}", o, e, ct);
+
+            return RunAsync(
+                "docker",
+                $"compose --env-file \"{envFile}\" -f \"{ComposePath()}\" up -d {serviceName}",
+                o, e, ct);
+        }
+
+        // ✅ ADD: optionales Down mit env-file (praktisch für Stop/Reset)
+        public static Task<int> ComposeDownWithEnvFileAsync(
+            string envFile,
+            Action<string>? o = null,
+            Action<string>? e = null,
+            CancellationToken ct = default)
+        {
+            if (string.IsNullOrWhiteSpace(envFile))
+                return ComposeAsync("down", o, e, ct);
+
+            return RunAsync(
+                "docker",
+                $"compose --env-file \"{envFile}\" -f \"{ComposePath()}\" down",
+                o, e, ct);
+        }
+
+        // =======================================================
+        // ✅ ADD: compose up/down with --profile support (Compose v2)
+        // (Needed for your docker-compose.yml profiles: dev/prod)
+        // =======================================================
+
+        public static Task<int> ComposeUpProfileAsync(
+            string profile,
+            string serviceName,
+            Action<string>? o = null,
+            Action<string>? e = null,
+            CancellationToken ct = default)
+        {
+            if (string.IsNullOrWhiteSpace(profile))
+                throw new ArgumentException("profile fehlt.", nameof(profile));
+            if (string.IsNullOrWhiteSpace(serviceName))
+                throw new ArgumentException("serviceName fehlt.", nameof(serviceName));
+
+            return RunAsync(
+                "docker",
+                $"compose --profile \"{profile.Trim()}\" -f \"{ComposePath()}\" up -d {serviceName.Trim()}",
+                o, e, ct);
+        }
+
+        public static Task<int> ComposeDownProfileAsync(
+            string profile,
+            Action<string>? o = null,
+            Action<string>? e = null,
+            CancellationToken ct = default)
+        {
+            if (string.IsNullOrWhiteSpace(profile))
+                throw new ArgumentException("profile fehlt.", nameof(profile));
+
+            return RunAsync(
+                "docker",
+                $"compose --profile \"{profile.Trim()}\" -f \"{ComposePath()}\" down",
+                o, e, ct);
+        }
+
+        // ✅ ADD: convenience wrappers for your docker-compose.yml
+        // services: network-dev (profile dev), network-prod (profile prod)
+        public static Task<int> NetworkUpDevAsync(
+            Action<string>? o = null,
+            Action<string>? e = null,
+            CancellationToken ct = default)
+            => ComposeUpProfileAsync("dev", "network-dev", o, e, ct);
+
+        public static Task<int> NetworkUpProdAsync(
+            Action<string>? o = null,
+            Action<string>? e = null,
+            CancellationToken ct = default)
+            => ComposeUpProfileAsync("prod", "network-prod", o, e, ct);
+
+        public static Task<int> NetworkDownDevAsync(
+            Action<string>? o = null,
+            Action<string>? e = null,
+            CancellationToken ct = default)
+            => ComposeDownProfileAsync("dev", o, e, ct);
+
+        public static Task<int> NetworkDownProdAsync(
+            Action<string>? o = null,
+            Action<string>? e = null,
+            CancellationToken ct = default)
+            => ComposeDownProfileAsync("prod", o, e, ct);
+
         // ✅ Unit compose: -f + (optional --profile) + -p + args + (optional service)
         private static Task<int> ComposeUnitAsync(
             GatewayIDE.App.ViewModels.UnitConfig u,
@@ -167,12 +269,8 @@ namespace GatewayIDE.App.Services.Processes
             if (u == null) throw new ArgumentNullException(nameof(u));
 
             var composeFile = string.IsNullOrWhiteSpace(u.ComposeFile) ? ComposePath() : u.ComposeFile.Trim();
-            var projectArg = string.IsNullOrWhiteSpace(u.ProjectName)
-                ? ""                                  // ✅ KEIN -p erzwingen
-                : $" -p \"{u.ProjectName.Trim()}\"";  // ✅ nur wenn explizit gesetzt
-
-            var args = $"compose -f \"{composeFile}\"{profileArg}{projectArg} {argsWithoutService}";
-                        var service = u.ServiceName?.Trim() ?? "";
+            var project = string.IsNullOrWhiteSpace(u.ProjectName) ? $"gateway-{u.Id}" : u.ProjectName.Trim();
+            var service = u.ServiceName?.Trim() ?? "";
 
             // ✅ NEW: optional compose profile (e.g. "dev")
             var profileArg = string.IsNullOrWhiteSpace(u.ComposeProfile)
@@ -380,7 +478,5 @@ namespace GatewayIDE.App.Services.Processes
             var rc = await UnitBuildNoCacheAsync(u, o, e, ct).ConfigureAwait(false);
             if (rc != 0) throw new Exception($"docker compose build fehlgeschlagen (rc={rc}).");
         }
-
-
     }
 }

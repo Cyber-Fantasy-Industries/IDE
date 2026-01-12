@@ -26,6 +26,9 @@ public static class AppBootstrap
         // Registry basiert auf Config
         sc.AddSingleton<RegistryService>();
 
+        sc.AddSingleton<NetworkHostService>();
+  
+
         // -------------------------
         // Network / Auth Core
         // -------------------------
