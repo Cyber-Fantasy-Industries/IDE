@@ -25,7 +25,7 @@
     <FeatureExplorer>true</FeatureExplorer>
     <FeatureEngines>true</FeatureEngines>
     <FeatureGitHub>true</FeatureGitHub>
-    <FeatureKiSystem>false</FeatureKiSystem>
+    <FeatureKiSystem>true</FeatureKiSystem>
     <FeatureNetwork>false</FeatureNetwork>
     <FeatureSettings>false</FeatureSettings>
     <FeatureChat>false</FeatureChat>

@@ -1,5 +1,5 @@
 @echo off
-setlocal EnableExtensions
+setlocal EnableExtensions EnableDelayedExpansion
 
 rem ============================================================
 rem  KEEP OPEN: wenn per Doppelklick gestartet -> cmd /k Relaunch
@@ -11,16 +11,52 @@ if /I "%~1" NEQ "__KEEP" (
 )
 shift
 
+rem ============================================================
+rem  FIND PROJECT ROOT (walk up until GatewayIDE.App\GatewayIDE.App.csproj exists)
+rem  ROOT wird am Ende immer der Ordner mit der csproj: ...\GatewayIDE.App\
+rem ============================================================
+set "ROOT="
+set "CUR=%~dp0"
+
+:ROOT_LOOP
+rem Case A: Script liegt direkt im Projektordner (GatewayIDE.App\)
+if exist "%CUR%GatewayIDE.App.csproj" (
+  set "ROOT=%CUR%"
+  goto ROOT_FOUND
+)
+
+rem Case B: Script liegt im Repo-Root (IDE\) -> Projekt liegt in Unterordner GatewayIDE.App\
+if exist "%CUR%GatewayIDE.App\GatewayIDE.App.csproj" (
+  set "ROOT=%CUR%GatewayIDE.App\"
+  goto ROOT_FOUND
+)
+
+set "PREV=%CUR%"
+for %%P in ("%CUR%..") do set "CUR=%%~fP\"
+
+rem Stop if we can't go higher (drive root reached)
+if /I "%CUR%"=="%PREV%" goto ROOT_NOT_FOUND
+goto ROOT_LOOP
+
+:ROOT_NOT_FOUND
+echo [ABORT] Konnte GatewayIDE.App.csproj nicht finden (vom Startpfad aus).
+echo [INFO] Startpfad war: %~dp0
+pause
+exit /b 1
+
+:ROOT_FOUND
+pushd "%ROOT%" || (echo [ABORT] pushd ROOT failed & exit /b 1)
+
 :START
 cls
 title GatewayIDE Build Script
 
 rem ============================================================
 rem  CONFIG
+rem  ROOT ist der Ordner, in dem GatewayIDE.App.csproj liegt.
 rem ============================================================
-set "ROOT=%~dp0"
-set "APP=%ROOT%GatewayIDE.App"
-set "CSPROJ=%APP%\GatewayIDE.App.csproj"
+set "APP=%ROOT%"
+set "CSPROJ=%ROOT%\GatewayIDE.App.csproj"
 
 set "RUNTIME=win-x64"
 set "OUTDIR=%APP%\bin\Release"
@@ -33,14 +69,14 @@ rem 0 = keep bin (only obj), 1 = clean bin\Debug+Release only, 2 = nuke bin
 set "CLEAN_MODE=1"
 
 rem ============================================================
-rem  LOGS + SAFE TEMP
+rem  LOGS + SAFE TEMP (stabil relativ zum Projektordner)
 rem ============================================================
-set "CRASHLOG=%ROOT%build-win-crash.log"
+set "CRASHLOG=%ROOT%\build-win-crash.log"
 
-set "LOGROOT=%APP%\bin\_buildlogs"
+set "LOGROOT=%ROOT%\bin\_buildlogs"
 if not exist "%LOGROOT%" mkdir "%LOGROOT%" >nul 2>&1
 
-set "SAFE_TEMP=%ROOT%_msbuildtmp"
+set "SAFE_TEMP=%ROOT%\_msbuildtmp"
 if not exist "%SAFE_TEMP%" mkdir "%SAFE_TEMP%" >nul 2>&1
 
 set "TEMP=%SAFE_TEMP%"
@@ -61,11 +97,16 @@ echo ============================================
 echo   GATEWAY IDE BUILD
 echo ============================================
 echo.
+echo [ROOT] %ROOT%
+echo [CSPROJ] %CSPROJ%
 echo [LOG] %LOG%
 echo [TMP] %SAFE_TEMP%
 echo.
 
 call :DOTNET_CHECK
+if errorlevel 1 goto :FAIL_HARD
+
+call :GIT_CHECK
 if errorlevel 1 goto :FAIL_HARD
 
 if not "%DOCKER_CLEAN_MODE%"=="0" (
@@ -78,7 +119,7 @@ rem  DOCKER CLEAN (optional)
 rem ============================================================
 if "%DOCKER_CLEAN_MODE%"=="1" (
   echo [INFO] Stoppe bekannte Container (leona/network)
-  docker rm -f leona-container  >nul 2>&1
+  docker rm -f leona-container   >nul 2>&1
   docker rm -f network-container >nul 2>&1
 )
 
@@ -158,7 +199,7 @@ echo   [X] Diagnostik (dotnet build -v:diag)
 echo   [Q] Quit
 echo ============================================
 set /p MODE="Bitte waehlen (R/D/X/Q): "
-if /I "%MODE%"=="Q" goto :EOF
+if /I "%MODE%"=="Q" goto :QUIT
 if /I "%MODE%"=="D" goto :RUN_DEBUG
 if /I "%MODE%"=="X" goto :RUN_DIAG
 goto :RUN_RELEASE
@@ -171,25 +212,33 @@ echo   [R] Retry
 echo   [Q] Quit
 echo ============================================
 set /p MODE="Bitte waehlen (X/R/Q): "
-if /I "%MODE%"=="Q" goto :EOF
+if /I "%MODE%"=="Q" goto :QUIT
 if /I "%MODE%"=="X" goto :RUN_DIAG
 goto :RETRY
+
 
 :RUN_RELEASE
 echo.
 echo [RUN] Release: %OUTEXE%
 echo.
 if not exist "%OUTEXE%" (
-  echo [ABORT] Release EXE existiert nicht.
+  echo [ABORT] Release EXE existiert nicht: %OUTEXE%
   goto :RETRY
 )
-pushd "%OUTDIR%"
+
+pushd "%OUTDIR%" || (
+  echo [ABORT] Konnte OUTDIR nicht betreten: %OUTDIR%
+  goto :RETRY
+)
+
 GatewayIDE.App.exe
 set "EC=%ERRORLEVEL%"
+
 popd
 echo.
 echo [EXITCODE] %EC%
 goto :RETRY
+
 
 :RUN_DEBUG
 echo.
@@ -199,6 +248,7 @@ dotnet run -c Debug --project "%CSPROJ%"
 echo.
 echo [EXITCODE] %ERRORLEVEL%
 goto :RETRY
+
 
 :RUN_DIAG
 echo.
@@ -214,43 +264,36 @@ if errorlevel 1 (
 goto :RETRY
 
 rem ============================================================
-rem  SUBROUTINES
+rem  SUBROUTINES (PASS 3/3 - cleaned)
 rem ============================================================
 
 :DOTNET_CHECK
 echo [RUN] .NET SDK check
+set "DOTNET_VER="
 
-rem 1) Normaler PATH-Check
+rem 1) PATH
 where dotnet >nul 2>&1
 if errorlevel 1 (
-  rem 2) Fallback A: User-local Install
-  if exist "C:\Program Files\dotnet\sdk" (
-    set "PATH=C:\Program Files\dotnet\sdk;C:\Program Files\dotnet\sdk\tools;%PATH%"
+  rem 2) Systemweit Standard
+  if exist "C:\Program Files\dotnet\dotnet.exe" (
+    set "PATH=C:\Program Files\dotnet;%PATH%"
   ) else (
-    rem 3) Fallback B: Systemweit (typisch)
-    if exist "C:\Program Files\dotnet\sdk\dotnet.exe" (
-      set "PATH=C:\Program Files\dotnet\sdk;%PATH%"
+    rem 3) User-local (Admin-frei)
+    if exist "%LOCALAPPDATA%\Microsoft\dotnet\dotnet.exe" (
+      set "DOTNET_ROOT=%LOCALAPPDATA%\Microsoft\dotnet"
+      set "PATH=%DOTNET_ROOT%;%DOTNET_ROOT%\tools;%PATH%"
     )
   )
 )
 
-rem 3) Nochmal pruefen
 where dotnet >nul 2>&1
 if errorlevel 1 (
-  echo [ABORT] dotnet.exe nicht im PATH gefunden
-  echo [HINT] Installiere .NET 8+ SDK: https://aka.ms/dotnet/download
-  exit /b 1
+  echo [WARN] dotnet.exe nicht gefunden
+  call :DOTNET_ASK_INSTALL
+  exit /b %ERRORLEVEL%
 )
 
-rem 4) Nochmal pruefen
-where dotnet >nul 2>&1
-if errorlevel 1 (
-  echo [ABORT] dotnet.exe nicht im PATH gefunden
-  echo [HINT] Installiere .NET 8+ SDK: https://aka.ms/dotnet/download
-  exit /b 1
-)
-
-rem --- Check: ist ein SDK mit Major >= 8 installiert?
+rem --- SDK >= 8 vorhanden?
 set "HAS_SDK8PLUS=0"
 for /f "usebackq tokens=1 delims= " %%s in (`dotnet --list-sdks 2^>nul`) do (
   for /f "tokens=1 delims=." %%m in ("%%s") do (
@@ -261,23 +304,7 @@ for /f "usebackq tokens=1 delims= " %%s in (`dotnet --list-sdks 2^>nul`) do (
 if "%HAS_SDK8PLUS%" NEQ "1" (
   echo [WARN] Kein .NET SDK >= 8 gefunden
   call :DOTNET_ASK_INSTALL
-  if errorlevel 1 (
-    echo [ABORT] .NET SDK >= 8 fehlt (Installation abgebrochen)
-    exit /b 1
-  )
-
-  rem --- nach Installation nochmal pruefen
-  set "HAS_SDK8PLUS=0"
-  for /f "usebackq tokens=1 delims= " %%s in (`dotnet --list-sdks 2^>nul`) do (
-    for /f "tokens=1 delims=." %%m in ("%%s") do (
-      if %%m GEQ 8 set "HAS_SDK8PLUS=1"
-    )
-  )
-  if "%HAS_SDK8PLUS%" NEQ "1" (
-    echo [ABORT] .NET SDK >= 8 ist immer noch nicht verfuegbar
-    echo [HINT] Bitte Installer abschliessen und Script erneut starten
-    exit /b 1
-  )
+  exit /b %ERRORLEVEL%
 )
 
 for /f "usebackq delims=" %%v in (`dotnet --version 2^>^&1`) do (
@@ -299,45 +326,32 @@ echo.
 echo ============================================
 echo   .NET SDK wird benoetigt
 echo ============================================
-echo GatewayIDE.App targetet .NET 8 (SDK >= 8 erforderlich)
-echo Auf diesem System wurde kein SDK >= 8 gefunden
+echo GatewayIDE.App braucht .NET SDK >= 8
 echo.
 
-set /p INSTALLDOTNET="Soll .NET 8 SDK jetzt installiert werden? (Y/N): "
+set /p INSTALLDOTNET="Soll .NET 8 SDK jetzt USER-LOCAL installiert werden? (Y/N): "
 if /I "%INSTALLDOTNET%" NEQ "Y" exit /b 1
 
-rem --------------------------------------------
-rem Architektur bestimmen (x64 vs arm64)
-rem --------------------------------------------
 set "DOTNET_ARCH=x64"
 if /I "%PROCESSOR_ARCHITECTURE%"=="ARM64" set "DOTNET_ARCH=arm64"
 
-rem --------------------------------------------
-rem Download dotnet-install.ps1 (stabiler Microsoft-Source)
-rem --------------------------------------------
 set "INSTALLPS1=%SAFE_TEMP%\dotnet-install.ps1"
-
 echo [DL] Lade dotnet-install.ps1 nach: "%INSTALLPS1%"
+
 where curl >nul 2>&1
 if not errorlevel 1 (
   curl -L --fail -o "%INSTALLPS1%" "https://dot.net/v1/dotnet-install.ps1"
 ) else (
   powershell -NoProfile -ExecutionPolicy Bypass -Command "try { $u='https://dot.net/v1/dotnet-install.ps1'; Invoke-WebRequest -Uri $u -OutFile '%INSTALLPS1%' -UseBasicParsing; exit 0 } catch { Write-Host $_; exit 1 }"
 )
+
 if errorlevel 1 (
   echo [ABORT] Download dotnet-install.ps1 fehlgeschlagen
-  echo [HINT] Bitte manuell installieren: https://aka.ms/dotnet/download
   exit /b 1
 )
 
-
-
-rem --------------------------------------------
-rem Installiere SDK Channel 8.0 fuer aktuelle Architektur
-rem -InstallDir: User-local, keine Adminrechte notwendig
-rem Danach PATH fuer diese Session anpassen
-rem --------------------------------------------
-set "DOTNET_INSTALL_DIR=C:\Program Files\dotnet\sdk"
+rem Admin-frei: user-local InstallDir
+set "DOTNET_INSTALL_DIR=%LOCALAPPDATA%\Microsoft\dotnet"
 
 echo [RUN] Installiere .NET SDK 8.0 (Arch=%DOTNET_ARCH%) nach "%DOTNET_INSTALL_DIR%"
 powershell -NoProfile -ExecutionPolicy Bypass -File "%INSTALLPS1%" ^
@@ -347,22 +361,90 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "%INSTALLPS1%" ^
   -NoPath
 
 if errorlevel 1 (
-  echo [ABORT] dotnet-install.ps1 Installation fehlgeschlagen
-  echo [HINT] Bitte manuell installieren: https://aka.ms/dotnet/download
+  echo [ABORT] Installation fehlgeschlagen
   exit /b 1
 )
 
-rem PATH fuer diese Session (damit dotnet sofort gefunden wird)
-set "PATH=%DOTNET_INSTALL_DIR%;%DOTNET_INSTALL_DIR%\tools;%PATH%"
+set "DOTNET_ROOT=%DOTNET_INSTALL_DIR%"
+set "PATH=%DOTNET_ROOT%;%DOTNET_ROOT%\tools;%PATH%"
 
-echo.
-echo [OK] Installation durchgefuehrt.
-echo [INFO] Re-Check: dotnet --info
-dotnet --info
-echo.
-pause
+dotnet --list-sdks >nul 2>&1
+if errorlevel 1 (
+  echo [ABORT] dotnet laeuft nach Installation nicht
+  exit /b 1
+)
+
+echo [OK] .NET SDK installiert (user-local)
 exit /b 0
 
+
+:GIT_CHECK
+echo [RUN] Git check
+
+where git >nul 2>&1
+if errorlevel 1 (
+  if exist "C:\Program Files\Git\cmd\git.exe" (
+    set "PATH=C:\Program Files\Git\cmd;C:\Program Files\Git\bin;%PATH%"
+  ) else if exist "C:\Program Files (x86)\Git\cmd\git.exe" (
+    set "PATH=C:\Program Files (x86)\Git\cmd;C:\Program Files (x86)\Git\bin;%PATH%"
+  )
+)
+
+where git >nul 2>&1
+if errorlevel 1 (
+  echo [WARN] git.exe nicht gefunden
+  call :GIT_ASK_INSTALL
+  exit /b %ERRORLEVEL%
+)
+
+for /f "usebackq delims=" %%v in (`git --version 2^>^&1`) do (
+  echo [OK] %%v
+  exit /b 0
+)
+
+echo [ABORT] git --version gab keine Ausgabe
+exit /b 1
+
+
+:GIT_ASK_INSTALL
+echo.
+echo ============================================
+echo   Git wird benoetigt
+echo ============================================
+echo.
+
+set /p INSTALLGIT="Soll Git jetzt installiert werden? (Y/N): "
+if /I "%INSTALLGIT%" NEQ "Y" exit /b 1
+
+where winget >nul 2>&1
+if errorlevel 1 (
+  echo [ABORT] winget nicht verfuegbar. Bitte Git manuell installieren.
+  exit /b 1
+)
+
+echo [RUN] winget install Git.Git
+winget install --id Git.Git -e --source winget
+if errorlevel 1 (
+  echo [ABORT] winget Installation fehlgeschlagen oder abgebrochen
+  exit /b 1
+)
+
+rem Re-check + PATH-Fallback
+where git >nul 2>&1
+if errorlevel 1 (
+  if exist "C:\Program Files\Git\cmd\git.exe" (
+    set "PATH=C:\Program Files\Git\cmd;C:\Program Files\Git\bin;%PATH%"
+  )
+)
+
+where git >nul 2>&1
+if errorlevel 1 (
+  echo [ABORT] Git ist nach Installation nicht im PATH
+  exit /b 1
+)
+
+echo [OK] Git installiert
+exit /b 0
 
 
 :DOCKER_CHECK
@@ -405,9 +487,7 @@ echo ============================================
 if defined LOG if exist "%LOG%" (
   call :SHOW_FAIL "%LOG%"
 )
-
 goto :RETRY
-
 
 
 :RETRY
@@ -417,4 +497,15 @@ echo   Taste druecken zum Neustart
 echo   (oder Fenster schliessen)
 echo ============================================
 pause >nul
+
+rem Ensure we are back in project root for the next loop (no dir-stack growth)
+cd /d "%ROOT%" >nul 2>&1
+
 goto :START
+
+
+:QUIT
+rem Cleanly unwind directory stack
+popd >nul 2>&1
+endlocal
+exit /b 0

@@ -5,6 +5,8 @@
              xmlns:expl="clr-namespace:GatewayIDE.App.Views.Explorer"
              xmlns:eng="clr-namespace:GatewayIDE.App.Views.Engines"
              xmlns:gh="clr-namespace:GatewayIDE.App.Views.GitHub"
+             xmlns:ki="clr-namespace:GatewayIDE.App.Views.KiSystem"
+
              x:Class="GatewayIDE.App.Views.Layout">
 
   <!-- Isolation Layout: nur LeftRail + Platzhalter -->
@@ -33,6 +35,10 @@
 
         <TabItem Header="GitHub">
           <gh:GitHubPanel />
+        </TabItem>
+
+        <TabItem Header="KI-System">
+          <ki:KiSystemPanel />
         </TabItem>
 
       </TabControl>
