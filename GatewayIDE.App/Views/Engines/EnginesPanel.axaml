@@ -1,7 +1,244 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="GatewayIDE.App.Views.Engines.EnginesPanel">
-  <Border Background="#121212" Padding="16">
-    <TextBlock Text="ENGINES" Foreground="#eaeaea" FontSize="18"/>
-  </Border>
+
+  <UserControl.Styles>
+
+    <!-- Card -->
+    <Style Selector="Border.card">
+      <Setter Property="Background" Value="#141414"/>
+      <Setter Property="BorderBrush" Value="#2a2a2a"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="12"/>
+      <Setter Property="Padding" Value="14"/>
+    </Style>
+
+    <!-- Titles -->
+    <Style Selector="TextBlock.h1">
+      <Setter Property="Foreground" Value="#eaeaea"/>
+      <Setter Property="FontSize" Value="18"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+
+    <Style Selector="TextBlock.h2">
+      <Setter Property="Foreground" Value="#eaeaea"/>
+      <Setter Property="FontSize" Value="14"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+
+    <Style Selector="TextBlock.muted">
+      <Setter Property="Foreground" Value="#9a9a9a"/>
+      <Setter Property="FontSize" Value="12"/>
+    </Style>
+
+    <Style Selector="TextBlock.mono">
+      <Setter Property="FontFamily" Value="Consolas, Cascadia Mono, Menlo, monospace"/>
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="Foreground" Value="#d8d8d8"/>
+    </Style>
+
+    <!-- Row -->
+    <Style Selector="Border.row">
+      <Setter Property="Background" Value="#101010"/>
+      <Setter Property="BorderBrush" Value="#242424"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="10"/>
+      <Setter Property="Padding" Value="10"/>
+    </Style>
+
+    <!-- Buttons -->
+    <Style Selector="Button.pill">
+      <Setter Property="Background" Value="#222"/>
+      <Setter Property="Foreground" Value="#eaeaea"/>
+      <Setter Property="BorderBrush" Value="#333"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="999"/>
+      <Setter Property="Padding" Value="10,6"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="FontSize" Value="12"/>
+    </Style>
+
+    <Style Selector="Button.pill:pointerover">
+      <Setter Property="Background" Value="#2b2b2b"/>
+    </Style>
+
+    <Style Selector="TextBox.search">
+      <Setter Property="Background" Value="#101010"/>
+      <Setter Property="BorderBrush" Value="#2a2a2a"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="10"/>
+      <Setter Property="Padding" Value="10,8"/>
+      <Setter Property="Foreground" Value="#eaeaea"/>
+      <Setter Property="WatermarkForeground" Value="#7a7a7a"/>
+    </Style>
+
+    <Style Selector="ComboBox.filter">
+      <Setter Property="Background" Value="#101010"/>
+      <Setter Property="BorderBrush" Value="#2a2a2a"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="10"/>
+      <Setter Property="Padding" Value="10,6"/>
+      <Setter Property="Foreground" Value="#eaeaea"/>
+    </Style>
+
+  </UserControl.Styles>
+
+  <Grid Background="#0f0f0f" Margin="12"
+        RowDefinitions="Auto,12,*">
+
+    <!-- Header -->
+    <Border Grid.Row="0" Classes="card">
+      <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,6,Auto">
+        <TextBlock Classes="h1" Text="Engines"/>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+          <Button Classes="pill"
+                  Content="Refresh"
+                  Command="{Binding RefreshCommand}"/>
+          <Button Classes="pill"
+                  Content="Add / Install…"
+                  Command="{Binding OpenCatalogCommand}"/>
+        </StackPanel>
+
+        <TextBlock Grid.Row="2" Classes="muted"
+                   Text="Engines anzeigen, installieren und konfigurieren (z.B. Docker, Unreal, Python, Node, Toolchains)"/>
+      </Grid>
+    </Border>
+
+    <!-- Body -->
+    <Grid Grid.Row="2" ColumnDefinitions="420,12,*">
+
+      <!-- Left: list -->
+      <Border Grid.Column="0" Classes="card">
+        <Grid RowDefinitions="Auto,10,Auto,10,*">
+
+          <!-- Search + Filter -->
+          <Grid RowDefinitions="Auto,10,Auto">
+            <TextBox Classes="search"
+                     Text="{Binding SearchText}"
+                     Watermark="Search engines… (name, version, tag)"/>
+            <Grid Grid.Row="2" ColumnDefinitions="*,10,Auto">
+              <ComboBox Classes="filter"
+                        ItemsSource="{Binding FilterOptions}"
+                        SelectedItem="{Binding SelectedFilter}"/>
+              <Button Grid.Column="2"
+                      Classes="pill"
+                      Content="Clear"
+                      Command="{Binding ClearFilterCommand}"/>
+            </Grid>
+          </Grid>
+
+          <!-- Count -->
+          <TextBlock Grid.Row="2" Classes="muted"
+                     Text="{Binding Engines.Count, StringFormat={}Engines: {0}}"/>
+
+          <!-- List -->
+          <Border Grid.Row="4" Background="#101010" BorderBrush="#222" BorderThickness="1" CornerRadius="10" Padding="10">
+            <ListBox ItemsSource="{Binding Engines}"
+                     SelectedItem="{Binding SelectedEngine}">
+              <ListBox.ItemTemplate>
+                <DataTemplate>
+                  <Border Classes="row" Margin="0,0,0,8">
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,6,Auto,6,Auto">
+
+                      <!-- Name + Version -->
+                      <StackPanel Grid.Column="0" Spacing="2">
+                        <TextBlock Classes="mono" Text="{Binding Name}"/>
+                        <TextBlock Classes="muted" Text="{Binding Version, StringFormat={}Version: {0}}"/>
+                      </StackPanel>
+
+                      <!-- Installed badge (text only; no converter) -->
+                      <TextBlock Grid.Column="1"
+                                 Classes="muted"
+                                 Text="{Binding Installed, StringFormat={}Installed: {0}}"/>
+
+                      <!-- Description -->
+                      <TextBlock Grid.Row="2" Grid.ColumnSpan="2"
+                                 Classes="muted"
+                                 Text="{Binding Description}"/>
+
+                      <!-- Actions -->
+                      <StackPanel Grid.Row="4" Grid.ColumnSpan="2"
+                                  Orientation="Horizontal" Spacing="8">
+                        <Button Classes="pill"
+                                Content="Install"
+                                Command="{Binding DataContext.InstallEngineCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                CommandParameter="{Binding}"/>
+                        <Button Classes="pill"
+                                Content="Uninstall"
+                                Command="{Binding DataContext.UninstallEngineCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                CommandParameter="{Binding}"/>
+                        <Button Classes="pill"
+                                Content="Settings"
+                                Command="{Binding DataContext.OpenSettingsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                CommandParameter="{Binding}"/>
+                      </StackPanel>
+
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+          </Border>
+
+        </Grid>
+      </Border>
+
+      <!-- Right: details -->
+      <Border Grid.Column="2" Classes="card">
+        <Grid RowDefinitions="Auto,10,Auto,10,*,10,Auto">
+
+          <TextBlock Classes="h2" Text="Details"/>
+
+          <!-- Selected engine summary -->
+          <Border Grid.Row="2" Background="#101010" BorderBrush="#222" BorderThickness="1" CornerRadius="10" Padding="12">
+            <StackPanel Spacing="6">
+              <TextBlock Classes="mono" Text="{Binding SelectedEngine.Name, FallbackValue=(no selection)}"/>
+              <TextBlock Classes="muted" Text="{Binding SelectedEngine.Version, StringFormat={}Version: {0}}"/>
+              <TextBlock Classes="muted" Text="{Binding SelectedEngine.Installed, StringFormat={}Installed: {0}}"/>
+              <TextBlock Classes="muted" Text="{Binding SelectedEngine.StatusText, FallbackValue=}"/>
+            </StackPanel>
+          </Border>
+
+          <!-- Config section -->
+          <Border Grid.Row="4" Background="#101010" BorderBrush="#222" BorderThickness="1" CornerRadius="10" Padding="12">
+            <StackPanel Spacing="10">
+              <TextBlock Classes="h2" Text="Configuration"/>
+              <TextBlock Classes="muted"
+                         Text="Hier kommen Engine-spezifische Settings hin (Paths, Versions, Env, Integrations)."/>
+
+              <!-- generic fields (optional) -->
+              <Grid ColumnDefinitions="140,10,*" RowDefinitions="Auto,8,Auto,8,Auto">
+                <TextBlock Text="Install Path" Classes="muted"/>
+                <TextBox Grid.Column="2"
+                         Classes="search"
+                         Text="{Binding SelectedEngine.InstallPath}"/>
+
+                <TextBlock Grid.Row="2" Text="Executable" Classes="muted"/>
+                <TextBox Grid.Row="2" Grid.Column="2"
+                         Classes="search"
+                         Text="{Binding SelectedEngine.ExecutablePath}"/>
+
+                <TextBlock Grid.Row="4" Text="Notes" Classes="muted"/>
+                <TextBox Grid.Row="4" Grid.Column="2"
+                         Classes="search"
+                         Text="{Binding SelectedEngine.Notes}"/>
+              </Grid>
+            </StackPanel>
+          </Border>
+
+          <!-- Footer actions -->
+          <StackPanel Grid.Row="6" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+            <Button Classes="pill"
+                    Content="Save"
+                    Command="{Binding SaveSelectedEngineCommand}"/>
+            <Button Classes="pill"
+                    Content="Open Folder"
+                    Command="{Binding OpenSelectedEngineFolderCommand}"/>
+          </StackPanel>
+
+        </Grid>
+      </Border>
+
+    </Grid>
+  </Grid>
 </UserControl>

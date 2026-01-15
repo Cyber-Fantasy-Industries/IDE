@@ -8,8 +8,8 @@
              xmlns:github="clr-namespace:GatewayIDE.App.Views.GitHub"
              xmlns:net="clr-namespace:GatewayIDE.App.Views.Network"
              xmlns:settings="clr-namespace:GatewayIDE.App.Views.Settings"
-             xmlns:chat="clr-namespace:GatewayIDE.App.Views.Chat"
              xmlns:ki="clr-namespace:GatewayIDE.App.Views.KiSystem"
+             xmlns:chat="clr-namespace:GatewayIDE.App.Views.Chat"
              x:Class="GatewayIDE.App.Views.Layout">
 
   <Grid ColumnDefinitions="56,Auto,*"
@@ -23,63 +23,65 @@
 
     <!-- Workspace -->
     <Grid Grid.Column="2"
-        Background="#0f0f0f"
-        RowDefinitions="*"
-        ColumnDefinitions="*">
+          Background="#0f0f0f">
 
-    <net:NetworkPanel
-        DataContext="{Binding Network}"
-        IsVisible="{Binding Layout.IsNetwork, FallbackValue=False}" />
+      <!-- DASHBOARD -->
+      <Border IsVisible="{Binding Layout.IsDashboard, FallbackValue=False}">
+        <dash:DashboardPanel DataContext="{Binding Dashboard}" />
+      </Border>
 
-    <docker:DockerPanel
-        DataContext="{Binding Docker}"
-        IsVisible="{Binding Layout.IsDocker, FallbackValue=False}" />
+      <!-- DOCKER -->
+      <Border IsVisible="{Binding Layout.IsDocker, FallbackValue=False}">
+        <docker:DockerPanel DataContext="{Binding Docker}" />
+      </Border>
 
-    <dash:DashboardPanel
-        DataContext="{Binding}" 
-        IsVisible="{Binding Layout.IsDashboard, FallbackValue=False}" />
+      <!-- NETWORK -->
+      <Border IsVisible="{Binding Layout.IsNetwork, FallbackValue=False}">
+        <net:NetworkPanel DataContext="{Binding Network}" />
+      </Border>
 
-    <engines:EnginesPanel
-        DataContext="{Binding Engines}"
-        IsVisible="{Binding Layout.IsEngines, FallbackValue=False}" />
+      <!-- EXPLORER -->
+      <Border IsVisible="{Binding Layout.IsExplorer, FallbackValue=False}">
+        <explorer:ExplorerPanel DataContext="{Binding Explorer}" />
+      </Border>
 
-    <explorer:ExplorerPanel
-        DataContext="{Binding Explorer}"
-        IsVisible="{Binding Layout.IsExplorer, FallbackValue=False}" />
+      <!-- ENGINES -->
+      <Border IsVisible="{Binding Layout.IsEngines, FallbackValue=False}">
+        <engines:EnginesPanel DataContext="{Binding Engines}" />
+      </Border>
 
-    <github:GitHubPanel
-        DataContext="{Binding GitHub}"
-        IsVisible="{Binding Layout.IsGitHub, FallbackValue=False}" />
+      <!-- GITHUB -->
+      <Border IsVisible="{Binding Layout.IsGitHub, FallbackValue=False}">
+        <github:GitHubPanel DataContext="{Binding GitHub}" />
+      </Border>
 
-    <ki:KiSystemPanel
-        DataContext="{Binding KiSystem}"
-        IsVisible="{Binding Layout.IsKiSystem, FallbackValue=False}" />
+      <!-- KI SYSTEM -->
+      <Border IsVisible="{Binding Layout.IsKiSystem, FallbackValue=False}">
+        <ki:KiSystemPanel DataContext="{Binding KiSystem}" />
+      </Border>
 
-    <settings:SettingsPanel
-        DataContext="{Binding Settings}"
-        IsVisible="{Binding Layout.IsSettings, FallbackValue=False}" />
+      <!-- SETTINGS -->
+      <Border IsVisible="{Binding Layout.IsSettings, FallbackValue=False}">
+        <settings:SettingsPanel DataContext="{Binding Settings}" />
+      </Border>
 
-    <!-- Fallback -->
-    <Border IsVisible="{Binding Layout.IsNone}"
-            BorderBrush="#444"
-            BorderThickness="1"
-            Margin="12"
-            Padding="12"
-            Background="#141414">
+      <!-- FALLBACK -->
+      <Border IsVisible="{Binding Layout.IsNone, FallbackValue=True}"
+              BorderBrush="#444"
+              BorderThickness="1"
+              Margin="12"
+              Padding="12"
+              Background="#141414">
         <StackPanel Spacing="6">
-        <TextBlock Foreground="#fff"
-                    FontSize="16"
-                    FontWeight="SemiBold"
-                    Text="⚠ Kein Panel aktiv (Tab-Mismatch)"/>
-        <TextBlock Foreground="#ddd"
-                    Text="{Binding Layout.ActiveTab, StringFormat='ActiveTab: {0}'}"/>
+          <TextBlock Foreground="#fff"
+                     FontSize="16"
+                     FontWeight="SemiBold"
+                     Text="⚠ Kein Panel aktiv (Tab-Mismatch)"/>
+          <TextBlock Foreground="#ddd"
+                     Text="{Binding Layout.ActiveTab, StringFormat='ActiveTab: {0}'}"/>
         </StackPanel>
-    </Border>
+      </Border>
 
     </Grid>
-
-
-
-
   </Grid>
 </UserControl>

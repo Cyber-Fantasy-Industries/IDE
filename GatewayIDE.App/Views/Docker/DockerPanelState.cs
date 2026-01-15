@@ -14,9 +14,9 @@ using Avalonia.VisualTree;
 namespace GatewayIDE.App.Views.Docker;
 
 /* =========================================================
- * DockerUi (Facade)
+ * DockerPanelState (Facade)
  * ========================================================= */
-public sealed class DockerUi
+public sealed class DockerPanelState
 {
     public DockerUnitsCatalog Units { get; }
     public DockerState State { get; }
@@ -24,7 +24,7 @@ public sealed class DockerUi
 
 
     // Parameterlos -> XAML friendly
-    public DockerUi()
+    public DockerPanelState()
     {
         Units = new DockerUnitsCatalog();
         State = new DockerState();

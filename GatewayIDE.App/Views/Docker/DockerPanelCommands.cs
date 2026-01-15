@@ -7,7 +7,7 @@ namespace GatewayIDE.App.Views.Docker;
 
 public sealed class DockerPanelCommands
 {
-    private readonly DockerUi _docker;
+    private readonly DockerPanelState _docker;
 
     public ICommand RefreshCommand { get; }
     public ICommand StartCommand { get; }
@@ -21,7 +21,7 @@ public sealed class DockerPanelCommands
     public ICommand ClearAllLogsCommand { get; }
     public ICommand ClearSelectedLogsCommand { get; }
 
-    public DockerPanelCommands(DockerUi docker)
+    public DockerPanelCommands(DockerPanelState docker)
     {
         _docker = docker;
 
