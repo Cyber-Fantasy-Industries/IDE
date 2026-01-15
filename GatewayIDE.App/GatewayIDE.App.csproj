@@ -25,26 +25,14 @@
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="9.0.0" />
   </ItemGroup>
 
-  <!-- XAML: erst alles entfernen, dann explizit einbinden -->
+  <!-- XAML -->
   <ItemGroup>
     <AvaloniaXaml Remove="**\*.axaml" />
     <AvaloniaResource Remove="**\*.axaml" />
   </ItemGroup>
 
   <ItemGroup>
-    <AvaloniaXaml Include="App.axaml" />
-    <AvaloniaXaml Include="MainWindow.axaml" />
-    <AvaloniaXaml Include="Views\Layout.axaml" />
-    <AvaloniaXaml Include="Views\LeftRail.axaml" />
-    <AvaloniaXaml Include="Views\Chat\SidePanel.axaml" />
-    <AvaloniaXaml Include="Views\Docker\DockerPanel.axaml" />
-    <AvaloniaXaml Include="Views\KiSystem\KiSystemPanel.axaml" />
-    <AvaloniaXaml Include="Views\Engines\EnginesPanel.axaml" />
-    <AvaloniaXaml Include="Views\GitHub\GitHubPanel.axaml" />
-    <AvaloniaXaml Include="Views\Explorer\ExplorerPanel.axaml" />
-    <AvaloniaXaml Include="Views\Settings\SettingsPanel.axaml" />
-    <AvaloniaXaml Include="Views\Network\NetworkPanel.axaml" />
-    <AvaloniaXaml Include="Views\Dashboard\DashboardPanel.axaml" />
+    <AvaloniaXaml Include="**\*.axaml" />
   </ItemGroup>
 
   <!-- Assets -->

@@ -127,7 +127,7 @@
     <!-- ========================= -->
     <!-- BODY                      -->
     <!-- ========================= -->
-    <views:MainLayout Grid.Row="1"/>
+    <views:Layout Grid.Row="1"/>
 
   </Grid>
 </Window>

@@ -4,12 +4,12 @@ GatewayIDE/
 ├── GatewayIDE.App/
 │   ├── Services/
 │   │   ├── App/
+│   │   │   ├── Appstate.cs
 │   │   │   ├── GatewayIDEConfig C#
-│   │   │   ├── SettingsService C#
+│   │   │   ├── NetworkRegistryModels C#
 │   │   │   ├── RegistryService C#
 │   │   │   ├── ServiceRegistryModels C#
-│   │   │   ├── NetworkRegistryModels C#
-│   │   │   └── Appstate.cs
+│   │   │   └── SettingsService C#
 │   │   ├── Auth/
 │   │   │   └── AuthBootstrapService C#
 │   │   ├── Chat/
@@ -18,26 +18,28 @@ GatewayIDE/
 │   │   │   └── DockerService C#
 │   │   └── Network/
 │   │       ├── GithubDeviceFlow C#
-│   │       ├── WireGuardKeys C#
 │   │       ├── NetworkApiService C#
+│   │       ├── NetworkDtos C#
+│   │       ├── NetworkHost C#
 │   │       ├── NetworkSession C#
-│   │       └── NetworkDtos C#
+│   │       └── WireGuardKeys C#
 │   ├── Views/
 │   │   ├── Chat/
 │   │   │   ├── SidePanel.axaml
 │   │   │   ├── SidePanel C#
+│   │   │   ├── SidePanelCommands C#
+│   │   │   ├── SidePanelState C#
 │   │   │   └── ChatState C#
 │   │   ├── Dashboard/
 │   │   │   ├── DashboardPanel.axaml
 │   │   │   ├── DashboardPanel C#
+│   │   │   ├── DashboardPanelState C#
+│   │   │   └── DashboardPanelCommands C#
 │   │   ├── Docker/
-│   │   │   ├── DockerController C#
-│   │   │   ├── DockerLogs C#
-│   │   │   ├── DockerPanel.axaml
 │   │   │   ├── DockerPanel C#
-│   │   │   ├── DockerState C#
-│   │   │   ├── DockerUi C#
-│   │   │   ├── DockerUnitsCatalog C#
+│   │   │   ├── DockerPanelState C#
+│   │   │   ├── DockerPanelCommands C#
+│   │   │   ├── DockerPanel.axaml
 │   │   │   ├── ServiceUnitVm C#
 │   │   │   ├── UnitConfig C#
 │   │   │   ├── UnitRuntime C#
@@ -45,23 +47,34 @@ GatewayIDE/
 │   │   ├── Engines/
 │   │   │   ├── EnginesPanel.axaml
 │   │   │   ├── EnginesPanel C#
+│   │   │   ├── EnginesPanelCommands C#
+│   │   │   └── EnginesPanelState C#
 │   │   ├── Explorer/
 │   │   │   ├── ExplorerPanel.axaml
 │   │   │   ├── ExplorerPanel C#
-│   │   │   ├── SettingsmPanel C#
+│   │   │   ├── ExplorerPanelState C#
+│   │   │   └── ExplorerPanelCommands C#
 │   │   ├── GitHub/
 │   │   │   ├── GitHubPanel.axaml
 │   │   │   ├── GitHubPanel C#
+│   │   │   ├── GitHubPanelState C#
+│   │   │   └── GitHubPanelCommands C#
 │   │   ├── KiSystem/
 │   │   │   ├── KiSystemPanel.axaml
 │   │   │   ├── KiSystemPanel C#
+│   │   │   ├── KiSystemPanelState C#
+│   │   │   ├── KiSystemPanelCommands C#
 │   │   │   └── ThreadRouter C#
 │   │   ├── Network/
 │   │   │   ├── NetworkPanel.axaml 
-│   │   │   └── NetworkPanel C#
+│   │   │   ├── NetworkPanel C#
+│   │   │   ├── NetworkPanelState C#
+│   │   │   └── NetworkPanelCommands C#
 │   │   ├── Settings/
 │   │   │   ├── SettingsPanel.axaml
-│   │   │   └── SettingsPanel C#
+│   │   │   ├── SettingsPanel C#
+│   │   │   ├── SettingsPanelState C#
+│   │   │   └── SettingsPanelCommands C#
 │   │   ├── LeftRail.axaml
 │   │   ├── LeftRail C#
 │   │   ├── LayoutState C#
@@ -75,7 +88,6 @@ GatewayIDE/
 │   ├── MainWindow C#
 │   ├── Commands C#
 │   ├── Converters C#
-│   ├── ViewModelBase C#
 │   ├── MainState C#
 │   └── Program C#
 ├── Network/
@@ -108,7 +120,6 @@ GatewayIDE/
 ├── GatewayIDE.sln
 ├── pyproject.toml
 ├── README.md
-├── AppBootstrap.cs
 └── uv.lock
 
 

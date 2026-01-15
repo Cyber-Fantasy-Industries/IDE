@@ -1,11 +1,11 @@
-// File: GatewayIDE.App/AppBootstrap.cs
 using System;
-
 using Microsoft.Extensions.DependencyInjection;
 
-using GatewayIDE.App.Services.App;
-using GatewayIDE.App.Services.Auth;
-using GatewayIDE.App.Services.Network;
+using GatewayIDE.App.Commands;
+using GatewayIDE.App.Views;
+using GatewayIDE.App.Views.Chat;
+using GatewayIDE.App.Views.Docker;
+using GatewayIDE.App.Views.KiSystem;
 
 namespace GatewayIDE.App;
 
@@ -16,45 +16,22 @@ public static class AppBootstrap
         var sc = new ServiceCollection();
 
         // -------------------------
-        // Settings / Config
+        // UI State (Single Owner)
         // -------------------------
-        sc.AddSingleton<SettingsService>();
-
-        // Config wird aus settings.json geladen (inkl. ENV override GATEWAY_NETWORK_API)
-        sc.AddSingleton(sp => sp.GetRequiredService<SettingsService>().Load());
-
-        // Registry basiert auf Config
-        sc.AddSingleton<RegistryService>();
-
-        sc.AddSingleton<NetworkHostService>();
-  
+        sc.AddSingleton<LayoutState>();
+        sc.AddSingleton<ThreadRouter>();
+        sc.AddSingleton<ChatState>();
+        sc.AddSingleton<DockerUi>();
 
         // -------------------------
-        // Network / Auth Core
+        // Commands (App-level)
         // -------------------------
-        sc.AddSingleton<NetworkSession>();
-        sc.AddSingleton<AppState>();
-
-        // AuthBootstrap braucht HttpClient (für GitHub device flow)
-        sc.AddHttpClient<AuthBootstrapService>();
-
-        // NetworkApiService braucht HttpClient + BaseAddress aus Config
-        sc.AddHttpClient<NetworkApiService>((sp, http) =>
-        {
-            var cfg = sp.GetRequiredService<GatewayIDEConfig>();
-            http.BaseAddress = new Uri(cfg.NetworkApiBaseUrl);
-        });
+        sc.AddSingleton<MainCommands>();
 
         // -------------------------
-        // App state (Composition Root)
+        // UI Root
         // -------------------------
         sc.AddSingleton<MainState>();
-
-        // Commands
-        sc.AddSingleton<GatewayIDE.App.Commands.MainCommands>();
-
-        // Views / VMs
-        sc.AddSingleton<GatewayIDE.App.Views.Network.NetworkPanelViewModel>();
 
         return sc.BuildServiceProvider();
     }

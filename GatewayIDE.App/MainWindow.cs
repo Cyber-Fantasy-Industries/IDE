@@ -1,7 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using System;
 
 namespace GatewayIDE.App;
 
@@ -11,9 +10,10 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        // Event auch manuell verbinden, falls XAML-Bindung zickt
-        AddHandler(DoubleTappedEvent, TitleDragZone_DoubleTapped!, handledEventsToo: true);
+        // NICHT überschreiben: App.cs setzt DataContext via DI
+        // DataContext = new MainState();
 
+        AddHandler(DoubleTappedEvent, TitleDragZone_DoubleTapped!, handledEventsToo: true);
     }
 
     private void TitleDragZone_PointerPressed(object? sender, PointerPressedEventArgs e)
@@ -26,6 +26,4 @@ public partial class MainWindow : Window
     {
         WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
     }
-
- 
 }

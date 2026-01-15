@@ -1,8 +1,8 @@
 using Avalonia.Controls;
 
-namespace GatewayIDE.App.ViewModels;
+namespace GatewayIDE.App.Views;
 
-public sealed class MainLayoutState : ViewModelBase
+public sealed class LayoutState : ObservableBase
 {
     // =========================
     // Tabs
@@ -16,7 +16,6 @@ public sealed class MainLayoutState : ViewModelBase
     public const string TAB_NETWORK  = "Network";
     public const string TAB_SETTINGS = "Settings";
 
-    // Default: Docker
     private string _activeTab = TAB_DASH;
     public string ActiveTab
     {
@@ -35,6 +34,7 @@ public sealed class MainLayoutState : ViewModelBase
             Raise(nameof(IsGitHub));
             Raise(nameof(IsNetwork));
             Raise(nameof(IsSettings));
+            Raise(nameof(IsNone));
         }
     }
 
@@ -49,6 +49,8 @@ public sealed class MainLayoutState : ViewModelBase
     public bool IsGitHub    => ActiveTab == TAB_GITHUB;
     public bool IsNetwork   => ActiveTab == TAB_NETWORK;
     public bool IsSettings  => ActiveTab == TAB_SETTINGS;
+    public bool IsNone =>
+        !(IsDashboard || IsDocker || IsKiSystem || IsExplorer || IsEngines || IsGitHub || IsNetwork || IsSettings);
 
     // =========================
     // Docker-Layout
@@ -73,6 +75,24 @@ public sealed class MainLayoutState : ViewModelBase
         get => _topRightColWidth;
         set { _topRightColWidth = value; Raise(); }
     }
+public void Select(string? raw)
+{
+    var tab = (raw ?? "").Trim();
+    if (string.IsNullOrWhiteSpace(tab)) tab = TAB_DASH;
+
+    ActiveTab = tab.ToLowerInvariant() switch
+    {
+        "dashboard" => TAB_DASH,
+        "docker"    => TAB_DOCK,
+        "ki system" => TAB_KI,
+        "explorer"  => TAB_EXPLORER,
+        "engines"   => TAB_ENGINES,
+        "github"    => TAB_GITHUB,
+        "network"   => TAB_NETWORK,
+        "settings"  => TAB_SETTINGS,
+        _           => tab
+    };
+}
 
 
 }

@@ -5,7 +5,9 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace GatewayIDE.App.ViewModels;
+using GatewayIDE.App.Views.KiSystem;
+
+namespace GatewayIDE.App.Services.Chat;
 
 public sealed class ChatService
 {

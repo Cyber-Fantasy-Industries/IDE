@@ -2,22 +2,22 @@ namespace GatewayIDE.App.Views.Docker;
 
 public sealed class UnitConfig
 {
-    public string Id { get; init; } = "";
-    public string DisplayName { get; init; } = "";
+    public string Id { get; set; } = "";
+    public string DisplayName { get; set; } = "";
 
-    public string ComposeFile { get; init; } = "docker-compose.yml";
-    public string ProjectName { get; init; } = "";
+    // Compose
+    public string? ComposeFile { get; set; }
+    public string? ComposeProfile { get; set; }
+    public string? ProjectName { get; set; }
 
-    // PROD
-    public string ServiceName { get; init; } = "";
-    public string ContainerName { get; init; } = "";
+    // 🔹 NEU
+    public string? EnvFile { get; set; }
 
-    // DEV (optional)
-    public string? DevServiceName { get; init; }
-    public string? DevContainerName { get; init; }
+    // Runtime
+    public string? ServiceName { get; set; }
+    public string? ContainerName { get; set; }
 
-    // Compose profile (optional) – z.B. "dev"
-    public string? ComposeProfile { get; init; }
-
-    public bool HasDevMode => !string.IsNullOrWhiteSpace(DevServiceName);
+    // Dev (optional)
+    public string? DevServiceName { get; set; }
+    public string? DevContainerName { get; set; }
 }

@@ -2,9 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="GatewayIDE.App.Views.Docker.DockerPanel">
 
-  <!-- Nur anzeigen, wenn Docker-Tab aktiv -->
-  <Grid IsVisible="{Binding Layout.IsDocker}"
-        Margin="8"
+  <Grid Margin="8"
         ClipToBounds="True">
 
     <!-- Main area: Units (left) + Logs (right) -->
@@ -25,7 +23,7 @@
 
           <ListBox Grid.Row="1"
                    ItemsSource="{Binding Docker.Units.Units}"
-                   SelectedItem="{Binding Docker.Units.SelectedUnit, Mode=TwoWay}">
+                   SelectedItem="{Binding Units.SelectedUnit, Mode=TwoWay}">
 
             <ListBox.ItemTemplate>
               <DataTemplate>
@@ -145,8 +143,8 @@
                   BorderBrush="#444"
                   BorderThickness="1"
                   Padding="8">
-            <TextBox Text="{Binding Docker.Units.SelectedUnit.Logs.DockerOutBuffer}"
-                     CaretIndex="{Binding Docker.Units.SelectedUnit.Logs.DockerOutCaret}"
+            <TextBox Text="{Binding Units.SelectedUnit.Logs.DockerOutBuffer}"
+                     CaretIndex="{Binding Units.SelectedUnit.Logs.DockerOutCaret}"
                      TextWrapping="Wrap"
                      FontFamily="Consolas, Menlo, monospace"
                      IsReadOnly="True"
@@ -161,8 +159,8 @@
                   BorderBrush="#444"
                   BorderThickness="1"
                   Padding="8">
-            <TextBox Text="{Binding Docker.Units.SelectedUnit.Logs.DockerErrBuffer}"
-                     CaretIndex="{Binding Docker.Units.SelectedUnit.Logs.DockerErrCaret}"
+            <TextBox Text="{Binding Units.SelectedUnit.Logs.DockerErrBuffer}"
+                     CaretIndex="{Binding Units.SelectedUnit.Logs.DockerErrCaret}"
                      TextWrapping="Wrap"
                      FontFamily="Consolas, Menlo, monospace"
                      IsReadOnly="True"
@@ -180,8 +178,8 @@
                 BorderThickness="1"
                 Margin="0,0,0,8"
                 Padding="8">
-          <TextBox Text="{Binding Docker.Units.SelectedUnit.Logs.GatewayLogBuffer}"
-                   CaretIndex="{Binding Docker.Units.SelectedUnit.Logs.GatewayLogCaret}"
+          <TextBox Text="{Binding Units.SelectedUnit.Logs.GatewayLogBuffer}"
+                   CaretIndex="{Binding Units.SelectedUnit.Logs.GatewayLogCaret}"
                    TextWrapping="Wrap"
                    FontFamily="Consolas, Menlo, monospace"
                    IsReadOnly="True"
@@ -198,8 +196,8 @@
                 BorderThickness="1"
                 Margin="0,0,0,8"
                 Padding="8">
-          <TextBox Text="{Binding Docker.Units.SelectedUnit.Logs.ContainerIOBuffer}"
-                   CaretIndex="{Binding Docker.Units.SelectedUnit.Logs.ContainerIOCaret}"
+          <TextBox Text="{Binding Units.SelectedUnit.Logs.ContainerIOBuffer}"
+                   CaretIndex="{Binding Units.SelectedUnit.Logs.ContainerIOCaret}"
                    TextWrapping="Wrap"
                    FontFamily="Consolas, Menlo, monospace"
                    IsReadOnly="True"
@@ -217,7 +215,7 @@
                  MaxHeight="200"
                  ScrollViewer.VerticalScrollBarVisibility="Auto"
                  Watermark="Befehl im Container ausführen (z. B. pip list)"
-                 Text="{Binding Docker.Controller.ContainerCommand, Mode=TwoWay}">
+                 Text="{Binding Controller.ContainerCommand, Mode=TwoWay}">
           <TextBox.KeyBindings>
             <KeyBinding Gesture="Enter"
                         Command="{Binding Commands.ExecuteInContainerCommand}"

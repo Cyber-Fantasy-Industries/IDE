@@ -1,14 +1,25 @@
+using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Media;
 using Avalonia.Threading;
-using System;
-namespace GatewayIDE.App.ViewModels;
+using GatewayIDE.App.Services.Chat;
+using GatewayIDE.App.Views.KiSystem;
 
-public sealed class ChatState : ViewModelBase, IDisposable
+namespace GatewayIDE.App.Views.Chat;
+
+public abstract class ObservableBase : INotifyPropertyChanged
 {
-    // UI-Model für die Liste
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void Raise([CallerMemberName] string? name = null)
+        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+}
+
+public sealed class ChatState : ObservableBase, IDisposable
+{
     public sealed class ChatLine
     {
         public string Text { get; }
@@ -16,12 +27,8 @@ public sealed class ChatState : ViewModelBase, IDisposable
         public ChatLine(string text, IBrush brush) { Text = text; Brush = brush; }
     }
 
-    public void Dispose()
-    {
-        _threads.Message -= OnThreadMessage;
-    }    public ObservableCollection<ChatLine> ChatLines { get; } = new();
+    public ObservableCollection<ChatLine> ChatLines { get; } = new();
 
-    // Sidebar (links)
     private double _leftPaneWidth = 260;
     public double LeftPaneWidth
     {
@@ -44,7 +51,6 @@ public sealed class ChatState : ViewModelBase, IDisposable
 
     public bool IsSidePanelShowingDashboard => !IsSidePanelShowingChat;
 
-    // Input + „Buffer“ (optional fürs UI, falls du’s noch brauchst)
     private readonly StringBuilder _chat = new();
     public string ChatBuffer => _chat.ToString();
 
@@ -70,29 +76,16 @@ public sealed class ChatState : ViewModelBase, IDisposable
         _threads = threads;
         _service = new ChatService(threads);
 
-        // ThreadRouter → Chat UI (nur T1/T3 kommen als Event rein)
         _threads.Message += OnThreadMessage;
     }
 
-    // ------------- Sidebar UX -------------
+    public void Dispose()
+        => _threads.Message -= OnThreadMessage;
+
     public void ToggleChatSidebar()
     {
-        // 1) Sidepanel ist zu → öffnen + Chat anzeigen
-        if (LeftPaneWidth <= 0)
-        {
-            LeftPaneWidth = 260;
-            IsSidePanelShowingChat = true;
-            return;
-        }
-
-        // 2) Sidepanel ist offen, zeigt aber Dashboard → auf Chat umschalten
-        if (!IsSidePanelShowingChat)
-        {
-            IsSidePanelShowingChat = true;
-            return;
-        }
-
-        // 3) Sidepanel ist offen und zeigt Chat → schließen
+        if (LeftPaneWidth <= 0) { LeftPaneWidth = 260; IsSidePanelShowingChat = true; return; }
+        if (!IsSidePanelShowingChat) { IsSidePanelShowingChat = true; return; }
         LeftPaneWidth = 0;
     }
 
@@ -100,32 +93,16 @@ public sealed class ChatState : ViewModelBase, IDisposable
     {
         appendTerm("[SIDE] Dashboard (via Rail)");
 
-        // 1) Sidepanel ist zu → öffnen + Dashboard anzeigen
-        if (LeftPaneWidth <= 0)
-        {
-            LeftPaneWidth = 260;
-            IsSidePanelShowingChat = false;
-            return;
-        }
-
-        // 2) Sidepanel ist offen, zeigt Chat → auf Dashboard umschalten
-        if (IsSidePanelShowingChat)
-        {
-            IsSidePanelShowingChat = false;
-            return;
-        }
-
-        // 3) Sidepanel ist offen und zeigt Dashboard → schließen
+        if (LeftPaneWidth <= 0) { LeftPaneWidth = 260; IsSidePanelShowingChat = false; return; }
+        if (IsSidePanelShowingChat) { IsSidePanelShowingChat = false; return; }
         LeftPaneWidth = 0;
     }
 
-    // ------------- Send -------------
     public async Task SendAsync()
     {
         var text = (ChatInput ?? string.Empty).Trim();
         if (string.IsNullOrWhiteSpace(text)) return;
 
-        // YOU → T1
         _threads.Append(ThreadId.T1, $"[YOU] {text}");
 
         _chat.AppendLine($"[YOU] {text}");
@@ -136,7 +113,6 @@ public sealed class ChatState : ViewModelBase, IDisposable
         await _service.SendPromptAsync(text);
     }
 
-    // ------------- Router → UI -------------
     private void OnThreadMessage(ThreadId id, string text)
     {
         void apply()
@@ -150,7 +126,6 @@ public sealed class ChatState : ViewModelBase, IDisposable
 
             ChatLines.Add(new ChatLine(text, brush));
             ChatSelectedIndex = ChatLines.Count - 1;
-            Raise(nameof(ChatSelectedIndex));
         }
 
         if (Dispatcher.UIThread.CheckAccess()) apply();

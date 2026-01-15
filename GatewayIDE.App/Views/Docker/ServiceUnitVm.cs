@@ -2,7 +2,7 @@ using Avalonia.Media;
 
 namespace GatewayIDE.App.Views.Docker;
 
-public sealed class ServiceUnitVm : ViewModelBase
+public sealed class ServiceUnitVm : ObservableBase
 {
     public UnitConfig Config { get; }
     public DockerLogs Logs { get; } = new();
@@ -47,7 +47,10 @@ public sealed class ServiceUnitVm : ViewModelBase
         };
     }
 
-    public bool HasDevMode => Config.HasDevMode;
+    public bool HasDevMode =>
+        !string.IsNullOrWhiteSpace(Config.DevServiceName) ||
+        !string.IsNullOrWhiteSpace(Config.DevContainerName);
+
     public string? ActiveComposeProfile => IsDev ? "dev" : null;
 
     public bool IsDev
@@ -59,17 +62,17 @@ public sealed class ServiceUnitVm : ViewModelBase
             Raise(nameof(IsDev));
             Raise(nameof(ActiveServiceName));
             Raise(nameof(ActiveContainerName));
+            Raise(nameof(ActiveComposeProfile));
         }
     }
 
     public string ActiveServiceName =>
         IsDev && !string.IsNullOrWhiteSpace(Config.DevServiceName)
             ? Config.DevServiceName!
-            : Config.ServiceName;
+            : (Config.ServiceName ?? string.Empty);
 
     public string ActiveContainerName =>
         IsDev && !string.IsNullOrWhiteSpace(Config.DevContainerName)
             ? Config.DevContainerName!
-            : Config.ContainerName;
-
+            : (Config.ContainerName ?? string.Empty);
 }

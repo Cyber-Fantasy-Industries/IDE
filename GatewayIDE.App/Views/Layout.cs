@@ -2,9 +2,9 @@ using Avalonia.Controls;
 
 namespace GatewayIDE.App.Views;
 
-public partial class MainLayout : UserControl
+public partial class Layout : UserControl
 {
-    public MainLayout()
+    public Layout()
     {
         InitializeComponent();
     }

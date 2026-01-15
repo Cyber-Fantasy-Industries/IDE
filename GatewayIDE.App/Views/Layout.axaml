@@ -1,8 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-
              xmlns:views="clr-namespace:GatewayIDE.App.Views"
-
              xmlns:dash="clr-namespace:GatewayIDE.App.Views.Dashboard"
              xmlns:docker="clr-namespace:GatewayIDE.App.Views.Docker"
              xmlns:explorer="clr-namespace:GatewayIDE.App.Views.Explorer"
@@ -12,44 +10,76 @@
              xmlns:settings="clr-namespace:GatewayIDE.App.Views.Settings"
              xmlns:chat="clr-namespace:GatewayIDE.App.Views.Chat"
              xmlns:ki="clr-namespace:GatewayIDE.App.Views.KiSystem"
+             x:Class="GatewayIDE.App.Views.Layout">
 
-             x:Class="GatewayIDE.App.Views.MainLayout">
-
-  <!-- Root Layout: LeftRail | SidePanel | Workspace -->
   <Grid ColumnDefinitions="56,Auto,*"
         Background="#0f0f0f">
 
     <!-- LeftRail -->
     <views:LeftRail Grid.Column="0"/>
 
-    <!-- SidePanel (wenn du es wieder anzeigen willst) -->
+    <!-- SidePanel -->
     <chat:SidePanel Grid.Column="1"/>
 
     <!-- Workspace -->
-    <Grid Grid.Column="2">
+    <Grid Grid.Column="2"
+        Background="#0f0f0f"
+        RowDefinitions="*"
+        ColumnDefinitions="*">
 
-      <!-- WICHTIG: kein ContentControl -> Grid erlaubt mehrere Children -->
-      <net:NetworkPanel
-          IsVisible="{Binding Layout.IsNetwork}" />
+    <net:NetworkPanel
+        DataContext="{Binding Network}"
+        IsVisible="{Binding Layout.IsNetwork, FallbackValue=False}" />
 
-      <docker:DockerPanel
-          IsVisible="{Binding Layout.IsDocker}" />
+    <docker:DockerPanel
+        DataContext="{Binding Docker}"
+        IsVisible="{Binding Layout.IsDocker, FallbackValue=False}" />
 
-      <dash:DashboardPanel
-          IsVisible="{Binding Layout.IsDashboard}" />
+    <dash:DashboardPanel
+        DataContext="{Binding}" 
+        IsVisible="{Binding Layout.IsDashboard, FallbackValue=False}" />
 
-      <engines:EnginesPanel
-          IsVisible="{Binding Layout.IsEngines}" />
+    <engines:EnginesPanel
+        DataContext="{Binding Engines}"
+        IsVisible="{Binding Layout.IsEngines, FallbackValue=False}" />
 
-      <explorer:ExplorerPanel
-          IsVisible="{Binding Layout.IsExplorer}" />
+    <explorer:ExplorerPanel
+        DataContext="{Binding Explorer}"
+        IsVisible="{Binding Layout.IsExplorer, FallbackValue=False}" />
 
-      <github:GitHubPanel
-          IsVisible="{Binding Layout.IsGitHub}" />
+    <github:GitHubPanel
+        DataContext="{Binding GitHub}"
+        IsVisible="{Binding Layout.IsGitHub, FallbackValue=False}" />
 
-      <settings:SettingsPanel
-          IsVisible="{Binding Layout.IsSettings}" />
+    <ki:KiSystemPanel
+        DataContext="{Binding KiSystem}"
+        IsVisible="{Binding Layout.IsKiSystem, FallbackValue=False}" />
+
+    <settings:SettingsPanel
+        DataContext="{Binding Settings}"
+        IsVisible="{Binding Layout.IsSettings, FallbackValue=False}" />
+
+    <!-- Fallback -->
+    <Border IsVisible="{Binding Layout.IsNone}"
+            BorderBrush="#444"
+            BorderThickness="1"
+            Margin="12"
+            Padding="12"
+            Background="#141414">
+        <StackPanel Spacing="6">
+        <TextBlock Foreground="#fff"
+                    FontSize="16"
+                    FontWeight="SemiBold"
+                    Text="⚠ Kein Panel aktiv (Tab-Mismatch)"/>
+        <TextBlock Foreground="#ddd"
+                    Text="{Binding Layout.ActiveTab, StringFormat='ActiveTab: {0}'}"/>
+        </StackPanel>
+    </Border>
 
     </Grid>
+
+
+
+
   </Grid>
 </UserControl>

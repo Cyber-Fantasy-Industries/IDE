@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GatewayIDE.App.Views.Docker;
 
-namespace GatewayIDE.App.Services.Processes
+namespace GatewayIDE.App.Services.Docker
 {
     public enum DesktopStatus { Open, Closed, NotInstalled, Unknown }
     public enum ContainerStatus { NotFound, Running, Exited, Unknown }
@@ -30,7 +30,7 @@ namespace GatewayIDE.App.Services.Processes
 
         private static bool HasAnyComposeFile(string dir)
         {
-            // Root-Marker: Compose-Standardnamen (Option A)
+            // Root-Marker: Compose-Standardnamen
             return File.Exists(Path.Combine(dir, "docker-compose.yml")) ||
                    File.Exists(Path.Combine(dir, "docker-compose.yaml")) ||
                    File.Exists(Path.Combine(dir, "compose.yml")) ||
@@ -137,6 +137,15 @@ namespace GatewayIDE.App.Services.Processes
         // ----------------------------
         // Compose helpers
         // ----------------------------
+        private static string BuildEnvFileArg(string? envFile)
+        {
+            if (string.IsNullOrWhiteSpace(envFile))
+                return "";
+
+            // docker compose --env-file "<path>"
+            return $" --env-file \"{envFile.Trim()}\"";
+        }
+
         private static async Task<(int rc, string stdout)> RunCaptureAsync(
             string file,
             string args,
@@ -148,6 +157,18 @@ namespace GatewayIDE.App.Services.Processes
             return (rc, sb.ToString());
         }
 
+        private static async Task<int> ComposeAsync(
+            string argsWithoutDockerPrefix,
+            Action<string>? o = null,
+            Action<string>? e = null,
+            CancellationToken ct = default)
+        {
+            return await RunAsync(
+                "docker",
+                $"compose -f \"{ComposePath()}\" {argsWithoutDockerPrefix}",
+                o, e, ct).ConfigureAwait(false);
+        }
+
         private static async Task<string?> ResolveContainerIdAsync(
             UnitConfig u,
             CancellationToken ct = default)
@@ -157,23 +178,25 @@ namespace GatewayIDE.App.Services.Processes
             if (string.IsNullOrWhiteSpace(service))
                 return null;
 
+            var envArg = BuildEnvFileArg(u.EnvFile);
+
             var profileArg = string.IsNullOrWhiteSpace(u.ComposeProfile)
                 ? ""
                 : $" --profile \"{u.ComposeProfile.Trim()}\"";
 
+            // ✅ kein -p erzwingen; nur wenn explizit gesetzt
             var projectArg = string.IsNullOrWhiteSpace(u.ProjectName)
-                ? "" // ✅ kein -p erzwingen
+                ? ""
                 : $" -p \"{u.ProjectName.Trim()}\"";
 
-            // ✅ liefert Container-ID (egal wie der Container heißt: ide-network-dev-1 etc.)
-            var args = $"compose -f \"{composeFile}\"{profileArg}{projectArg} ps -q {service}";
+            // ✅ liefert Container-ID (egal wie der Container heißt)
+            var args = $"compose{envArg} -f \"{composeFile}\"{profileArg}{projectArg} ps -q {service}";
             var (rc, outText) = await RunCaptureAsync("docker", args, null, ct).ConfigureAwait(false);
             if (rc != 0) return null;
 
             var id = outText.Trim();
             return string.IsNullOrWhiteSpace(id) ? null : id;
         }
-
 
         // ✅ ADD: compose up -d <service> mit env-file (Compose v2: --env-file)
         // docker compose --env-file "<envFile>" -f "<compose>" up -d <service>
@@ -214,8 +237,7 @@ namespace GatewayIDE.App.Services.Processes
         }
 
         // =======================================================
-        // ✅ ADD: compose up/down with --profile support (Compose v2)
-        // (Needed for your docker-compose.yml profiles: dev/prod)
+        // compose up/down with --profile support (Compose v2)
         // =======================================================
 
         public static Task<int> ComposeUpProfileAsync(
@@ -251,33 +273,20 @@ namespace GatewayIDE.App.Services.Processes
                 o, e, ct);
         }
 
-        // ✅ ADD: convenience wrappers for your docker-compose.yml
-        // services: network-dev (profile dev), network-prod (profile prod)
-        public static Task<int> NetworkUpDevAsync(
-            Action<string>? o = null,
-            Action<string>? e = null,
-            CancellationToken ct = default)
+        // ✅ convenience wrappers
+        public static Task<int> NetworkUpDevAsync(Action<string>? o = null, Action<string>? e = null, CancellationToken ct = default)
             => ComposeUpProfileAsync("dev", "network-dev", o, e, ct);
 
-        public static Task<int> NetworkUpProdAsync(
-            Action<string>? o = null,
-            Action<string>? e = null,
-            CancellationToken ct = default)
+        public static Task<int> NetworkUpProdAsync(Action<string>? o = null, Action<string>? e = null, CancellationToken ct = default)
             => ComposeUpProfileAsync("prod", "network-prod", o, e, ct);
 
-        public static Task<int> NetworkDownDevAsync(
-            Action<string>? o = null,
-            Action<string>? e = null,
-            CancellationToken ct = default)
+        public static Task<int> NetworkDownDevAsync(Action<string>? o = null, Action<string>? e = null, CancellationToken ct = default)
             => ComposeDownProfileAsync("dev", o, e, ct);
 
-        public static Task<int> NetworkDownProdAsync(
-            Action<string>? o = null,
-            Action<string>? e = null,
-            CancellationToken ct = default)
+        public static Task<int> NetworkDownProdAsync(Action<string>? o = null, Action<string>? e = null, CancellationToken ct = default)
             => ComposeDownProfileAsync("prod", o, e, ct);
 
-        // ✅ Unit compose: -f + (optional --profile) + -p + args + (optional service)
+        // ✅ Unit compose: -f + (optional --profile) + (optional -p) + args + (optional service)
         private static Task<int> ComposeUnitAsync(
             UnitConfig u,
             string argsWithoutService,
@@ -289,16 +298,11 @@ namespace GatewayIDE.App.Services.Processes
             if (u == null) throw new ArgumentNullException(nameof(u));
 
             var composeFile = string.IsNullOrWhiteSpace(u.ComposeFile) ? ComposePath() : u.ComposeFile.Trim();
-<<<<<<< Updated upstream
-            var project = string.IsNullOrWhiteSpace(u.ProjectName) ? $"gateway-{u.Id}" : u.ProjectName.Trim();
             var service = u.ServiceName?.Trim() ?? "";
 
-            // ✅ NEW: optional compose profile (e.g. "dev")
-=======
-            var service = u.ServiceName?.Trim() ?? "";
+            var envArg = BuildEnvFileArg(u.EnvFile);
 
             // ✅ optional compose profile (e.g. "dev")
->>>>>>> Stashed changes
             var profileArg = string.IsNullOrWhiteSpace(u.ComposeProfile)
                 ? ""
                 : $" --profile \"{u.ComposeProfile.Trim()}\"";
@@ -308,7 +312,7 @@ namespace GatewayIDE.App.Services.Processes
                 ? ""
                 : $" -p \"{u.ProjectName.Trim()}\"";
 
-            var cmdArgs = $"compose -f \"{composeFile}\"{profileArg}{projectArg} {argsWithoutService}";
+            var cmdArgs = $"compose{envArg} -f \"{composeFile}\"{profileArg}{projectArg} {argsWithoutService}";
             if (appendServiceName && !string.IsNullOrWhiteSpace(service))
                 cmdArgs += $" {service}";
 
@@ -317,7 +321,6 @@ namespace GatewayIDE.App.Services.Processes
 
         private static string EscapeForBash(string s)
             => (s ?? "").Replace("\"", "\\\"");
-
 
         // ----------------------------
         // Status (Host + Container)
@@ -368,7 +371,7 @@ namespace GatewayIDE.App.Services.Processes
             return rc == 0;
         }
 
-        // ✅ Generic container status (by container name)
+        // ✅ Generic container status (by container name or id)
         public static async Task<ContainerStatus> GetContainerStatusAsync(
             string containerName,
             Action<string>? o = null,
@@ -399,7 +402,7 @@ namespace GatewayIDE.App.Services.Processes
             };
         }
 
-        // ✅ Unit status (uses ContainerName)
+        // ✅ Unit status (uses ContainerName if present, else resolve via compose)
         public static async Task<ContainerStatus> GetUnitStatusAsync(
             UnitConfig u,
             Action<string>? o = null,
@@ -418,85 +421,53 @@ namespace GatewayIDE.App.Services.Processes
             return await GetContainerStatusAsync(id, o, e, ct).ConfigureAwait(false);
         }
 
-
         // ----------------------------
         // Unit operations (compose)
         // ----------------------------
-
-        public static Task<int> UnitUpAsync(
-            UnitConfig u,
-            Action<string>? o = null,
-            Action<string>? e = null,
-            CancellationToken ct = default)
+        public static Task<int> UnitUpAsync(UnitConfig u, Action<string>? o = null, Action<string>? e = null, CancellationToken ct = default)
             => ComposeUnitAsync(u, "up -d", appendServiceName: true, o, e, ct);
 
-        public static Task<int> UnitStopAsync(
-            UnitConfig u,
-            Action<string>? o = null,
-            Action<string>? e = null,
-            CancellationToken ct = default)
+        public static Task<int> UnitStopAsync(UnitConfig u, Action<string>? o = null, Action<string>? e = null, CancellationToken ct = default)
             => ComposeUnitAsync(u, "stop", appendServiceName: true, o, e, ct);
 
-        public static Task<int> UnitDownAsync(
-            UnitConfig u,
-            Action<string>? o = null,
-            Action<string>? e = null,
-            CancellationToken ct = default)
+        public static Task<int> UnitDownAsync(UnitConfig u, Action<string>? o = null, Action<string>? e = null, CancellationToken ct = default)
             // down ist project-scope; service name ist hier nicht nötig
             => ComposeUnitAsync(u, "down", appendServiceName: false, o, e, ct);
 
-        public static Task<int> UnitRestartAsync(
-            UnitConfig u,
-            Action<string>? o = null,
-            Action<string>? e = null,
-            CancellationToken ct = default)
+        public static Task<int> UnitRestartAsync(UnitConfig u, Action<string>? o = null, Action<string>? e = null, CancellationToken ct = default)
             => ComposeUnitAsync(u, "restart", appendServiceName: true, o, e, ct);
 
-        public static Task<int> UnitBuildNoCacheAsync(
-            UnitConfig u,
-            Action<string>? o = null,
-            Action<string>? e = null,
-            CancellationToken ct = default)
+        public static Task<int> UnitBuildNoCacheAsync(UnitConfig u, Action<string>? o = null, Action<string>? e = null, CancellationToken ct = default)
             => ComposeUnitAsync(u, "build --no-cache", appendServiceName: true, o, e, ct);
 
-        public static Task<int> UnitTailLogsAsync(
-            UnitConfig u,
-            Action<string>? o = null,
-            Action<string>? e = null,
-            CancellationToken ct = default)
+        public static Task<int> UnitTailLogsAsync(UnitConfig u, Action<string>? o = null, Action<string>? e = null, CancellationToken ct = default)
             => ComposeUnitAsync(u, "logs -f", appendServiceName: true, o, e, ct);
 
-        public static Task<int> UnitRemoveContainerAsync(
-            UnitConfig u,
-            Action<string>? o = null,
-            Action<string>? e = null,
-            CancellationToken ct = default)
+        public static Task<int> UnitRemoveContainerAsync(UnitConfig u, Action<string>? o = null, Action<string>? e = null, CancellationToken ct = default)
             => ComposeUnitAsync(u, "rm -f", appendServiceName: true, o, e, ct);
 
         // ----------------------------
-        // Unit exec (docker exec by container name)
+        // Unit exec (docker exec by container id/name)
         // ----------------------------
+        public static async Task<int> UnitExecAsync(
+            UnitConfig u,
+            string command,
+            Action<string>? o = null,
+            Action<string>? e = null,
+            CancellationToken ct = default)
+        {
+            var container = u.ContainerName?.Trim();
+            if (string.IsNullOrWhiteSpace(container))
+                container = await ResolveContainerIdAsync(u, ct).ConfigureAwait(false);
 
-    public static async Task<int> UnitExecAsync(
-        UnitConfig u,
-        string command,
-        Action<string>? o = null,
-        Action<string>? e = null,
-        CancellationToken ct = default)
-    {
-        var container = u.ContainerName?.Trim();
-        if (string.IsNullOrWhiteSpace(container))
-            container = await ResolveContainerIdAsync(u, ct).ConfigureAwait(false);
+            if (string.IsNullOrWhiteSpace(container))
+                throw new InvalidOperationException(
+                    $"Unit '{u.DisplayName}' hat keinen Container gefunden (ServiceName='{u.ServiceName}')."
+                );
 
-        if (string.IsNullOrWhiteSpace(container))
-            throw new InvalidOperationException(
-                $"Unit '{u.DisplayName}' hat keinen Container gefunden (ServiceName='{u.ServiceName}')."
-            );
-
-        var escaped = EscapeForBash(command);
-        return await RunAsync("docker", $"exec {container} bash -lc \"{escaped}\"", o, e, ct).ConfigureAwait(false);
-    }
-
+            var escaped = EscapeForBash(command);
+            return await RunAsync("docker", $"exec {container} bash -lc \"{escaped}\"", o, e, ct).ConfigureAwait(false);
+        }
 
         // ----------------------------
         // Wipe (unit-scoped)

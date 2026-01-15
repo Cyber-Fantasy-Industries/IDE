@@ -1,10 +1,11 @@
+using System;
 using System.Text;
 
-namespace GatewayIDE.App.ViewModels;
+namespace GatewayIDE.App.Views.KiSystem;
 
 public enum ThreadId { T1 = 1, T2 = 2, T3 = 3, T4 = 4, T5 = 5, T6 = 6 }
 
-public sealed class ThreadBuffers : ViewModelBase
+public sealed class ThreadBuffers
 {
     private readonly StringBuilder _t2 = new(), _t4 = new(), _t5 = new(), _t6 = new();
 
@@ -18,34 +19,20 @@ public sealed class ThreadBuffers : ViewModelBase
     public int T5Caret => _t5.Length;
     public int T6Caret => _t6.Length;
 
+    public event Action? Changed;
+
     internal void AppendTo(ThreadId id, string text)
     {
         switch (id)
         {
-            case ThreadId.T2:
-                _t2.AppendLine(text);
-                Raise(nameof(T2Buffer));
-                Raise(nameof(T2Caret));
-                break;
-
-            case ThreadId.T4:
-                _t4.AppendLine(text);
-                Raise(nameof(T4Buffer));
-                Raise(nameof(T4Caret));
-                break;
-
-            case ThreadId.T5:
-                _t5.AppendLine(text);
-                Raise(nameof(T5Buffer));
-                Raise(nameof(T5Caret));
-                break;
-
-            case ThreadId.T6:
-                _t6.AppendLine(text);
-                Raise(nameof(T6Buffer));
-                Raise(nameof(T6Caret));
-                break;
+            case ThreadId.T2: _t2.AppendLine(text); break;
+            case ThreadId.T4: _t4.AppendLine(text); break;
+            case ThreadId.T5: _t5.AppendLine(text); break;
+            case ThreadId.T6: _t6.AppendLine(text); break;
+            default: return;
         }
+
+        Changed?.Invoke();
     }
 }
 
@@ -55,7 +42,7 @@ public sealed class ThreadRouter
 
     /// <summary>
     /// Für T1/T3 (sichtbar im Chat) feuern wir ein Event.
-    /// Für T2/T4/T5/T6 schreiben wir in Buffers.
+    /// Für T2/T4/T5/T6 gehen wir in Buffers.
     /// </summary>
     public event Action<ThreadId, string>? Message;
 
@@ -70,9 +57,6 @@ public sealed class ThreadRouter
         Buffers.AppendTo(id, text);
     }
 
-    /// <summary>
-    /// Zentraler Agent→Thread Router (Logik aus dem Original, nur ausgelagert).
-    /// </summary>
     public void AppendAgentReply(string? agent, string? content)
     {
         if (string.IsNullOrWhiteSpace(content)) return;
@@ -81,34 +65,13 @@ public sealed class ThreadRouter
 
         switch (a)
         {
-            case "SOM":
-                Append(ThreadId.T1, $"[SOM]\n{content}");
-                break;
-
-            case "SOM:INNER":
-                Append(ThreadId.T2, content!);
-                break;
-
-            case "TASKMANAGER":
-                Append(ThreadId.T4, $"[TaskManager]\n{content}");
-                break;
-
-            case "LIBRARIAN":
-                Append(ThreadId.T5, $"[Librarian]\n{content}");
-                break;
-
-            case "TRAINER":
-                Append(ThreadId.T6, $"[Trainer]\n{content}");
-                break;
-
-            case "RETURN":
-                Append(ThreadId.T3, content!);
-                break;
-
-            default:
-                Append(ThreadId.T1, $"[{(agent ?? "HMA")}]\n{content}");
-                break;
+            case "SOM":       Append(ThreadId.T1, $"[SOM]\n{content}"); break;
+            case "SOM:INNER": Append(ThreadId.T2, content!); break;
+            case "TASKMANAGER": Append(ThreadId.T4, $"[TaskManager]\n{content}"); break;
+            case "LIBRARIAN": Append(ThreadId.T5, $"[Librarian]\n{content}"); break;
+            case "TRAINER":   Append(ThreadId.T6, $"[Trainer]\n{content}"); break;
+            case "RETURN":    Append(ThreadId.T3, content!); break;
+            default:          Append(ThreadId.T1, $"[{(agent ?? "HMA")}]\n{content}"); break;
         }
     }
 }
-
