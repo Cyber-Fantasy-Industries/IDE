@@ -22,7 +22,7 @@
 
     <!-- Panels -->
     <FeatureDashboard>true</FeatureDashboard>
-    <FeatureExplorer>false</FeatureExplorer>
+    <FeatureExplorer>true</FeatureExplorer>
     <FeatureEngines>false</FeatureEngines>
     <FeatureGitHub>false</FeatureGitHub>
     <FeatureKiSystem>false</FeatureKiSystem>

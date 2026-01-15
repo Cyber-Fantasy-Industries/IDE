@@ -46,7 +46,7 @@
       <Setter Property="CornerRadius" Value="8"/>
       <Setter Property="Padding" Value="8,6"/>
       <Setter Property="Foreground" Value="#eaeaea"/>
-      <Setter Property="WatermarkForeground" Value="#7a7a7a"/>
+      <!-- WatermarkForeground ist in deinem Build nicht verfügbar -> raus -->
     </Style>
 
   </UserControl.Styles>
@@ -91,7 +91,7 @@
           <TextBlock Classes="header" Text="Content Explorer"/>
           <TextBlock Grid.Column="1"
                      Classes="muted"
-                     Text="{Binding ContentItems.Count, StringFormat=Items: \{0\}}"/>
+                     Text="{Binding ContentItems.Count, StringFormat=Items: {0}}"/>
         </Grid>
 
         <!-- Search -->
@@ -106,15 +106,14 @@
             <ItemsControl.ItemsPanel>
               <ItemsPanelTemplate>
                 <WrapPanel ItemWidth="120"
-                           ItemHeight="120"
-                           HorizontalSpacing="12"
-                           VerticalSpacing="12"/>
+                           ItemHeight="120"/>
               </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
 
             <ItemsControl.ItemTemplate>
               <DataTemplate>
-                <Border Classes="item">
+                <!-- Spacing-Ersatz: Margin statt WrapPanel Horizontal/VerticalSpacing -->
+                <Border Classes="item" Margin="0,0,12,12">
                   <StackPanel Spacing="6"
                               HorizontalAlignment="Center"
                               VerticalAlignment="Center">

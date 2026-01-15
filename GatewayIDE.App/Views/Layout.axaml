@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:views="clr-namespace:GatewayIDE.App.Views"
              xmlns:dash="clr-namespace:GatewayIDE.App.Views.Dashboard"
+             xmlns:expl="clr-namespace:GatewayIDE.App.Views.Explorer"
              x:Class="GatewayIDE.App.Views.Layout">
 
   <!-- Isolation Layout: nur LeftRail + Platzhalter -->
@@ -13,7 +14,16 @@
     <views:LeftRail Grid.Column="0"/>
 
     <!-- Workspace -->
-    <dash:DashboardPanel Grid.Column="1" />
+    <Grid Grid.Column="1" Margin="12" RowDefinitions="Auto,*">
+      <TabControl>
+        <TabItem Header="Explorer">
+          <expl:ExplorerPanel />
+        </TabItem>
+        <TabItem Header="Dashboard">
+          <dash:DashboardPanel />
+        </TabItem>
+      </TabControl>
+    </Grid>
 
     <!-- Statusbar (optional, aber stabil) -->
     <Border Grid.Row="1"
