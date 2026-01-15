@@ -21,7 +21,7 @@
     <FeatureLeftRail>true</FeatureLeftRail>
 
     <!-- Panels -->
-    <FeatureDashboard>false</FeatureDashboard>
+    <FeatureDashboard>true</FeatureDashboard>
     <FeatureExplorer>false</FeatureExplorer>
     <FeatureEngines>false</FeatureEngines>
     <FeatureGitHub>false</FeatureGitHub>

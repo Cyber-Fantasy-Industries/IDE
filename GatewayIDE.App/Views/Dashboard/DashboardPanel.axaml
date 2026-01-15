@@ -76,7 +76,7 @@
         </Border>
 
         <!-- Status Cards -->
-        <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+        <Grid ColumnDefinitions="*,12,*">
 
           <!-- Docker Installed -->
           <Border Classes="card" Grid.Column="0">
@@ -97,8 +97,10 @@
             </Grid>
           </Border>
 
+          <!-- Spacer ist die mittlere Spalte (12px) -->
+
           <!-- Docker Running -->
-          <Border Classes="card" Grid.Column="1">
+          <Border Classes="card" Grid.Column="2">
             <Grid RowDefinitions="Auto,10,Auto,10,Auto">
               <TextBlock Classes="h2" Text="Docker läuft"/>
               <Border Grid.Row="2" Classes="badge"
@@ -167,7 +169,7 @@
 
         <!-- Empty hint (if no containers) -->
         <Border Classes="card"
-                IsVisible="{Binding RunningContainers.Count, Converter={x:Static conv:ZeroToBoolConverter.Instance}}">
+                IsVisible="{Binding RunningContainers.Count, Converter={x:Static conv:ZeroToBoolConverter.Instance}, ConverterParameter=invert}">
           <StackPanel Spacing="6">
             <TextBlock Classes="h2" Text="Keine laufenden Container"/>
             <TextBlock Classes="muted"
