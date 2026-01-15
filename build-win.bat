@@ -224,12 +224,12 @@ rem 1) Normaler PATH-Check
 where dotnet >nul 2>&1
 if errorlevel 1 (
   rem 2) Fallback A: User-local Install
-  if exist "%LOCALAPPDATA%\Microsoft\dotnet\dotnet.exe" (
-    set "PATH=%LOCALAPPDATA%\Microsoft\dotnet;%LOCALAPPDATA%\Microsoft\dotnet\tools;%PATH%"
+  if exist "C:\Program Files\dotnet\sdk" (
+    set "PATH=C:\Program Files\dotnet\sdk;C:\Program Files\dotnet\sdk\tools;%PATH%"
   ) else (
     rem 3) Fallback B: Systemweit (typisch)
-    if exist "%ProgramFiles%\dotnet\dotnet.exe" (
-      set "PATH=%ProgramFiles%\dotnet;%PATH%"
+    if exist "C:\Program Files\dotnet\sdk\dotnet.exe" (
+      set "PATH=C:\Program Files\dotnet\sdk;%PATH%"
     )
   )
 )
@@ -337,7 +337,7 @@ rem Installiere SDK Channel 8.0 fuer aktuelle Architektur
 rem -InstallDir: User-local, keine Adminrechte notwendig
 rem Danach PATH fuer diese Session anpassen
 rem --------------------------------------------
-set "DOTNET_INSTALL_DIR=%LOCALAPPDATA%\Microsoft\dotnet"
+set "DOTNET_INSTALL_DIR=C:\Program Files\dotnet\sdk"
 
 echo [RUN] Installiere .NET SDK 8.0 (Arch=%DOTNET_ARCH%) nach "%DOTNET_INSTALL_DIR%"
 powershell -NoProfile -ExecutionPolicy Bypass -File "%INSTALLPS1%" ^
