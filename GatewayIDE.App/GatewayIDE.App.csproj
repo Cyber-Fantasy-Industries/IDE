@@ -23,16 +23,16 @@
     <!-- Panels -->
     <FeatureDashboard>true</FeatureDashboard>
     <FeatureExplorer>true</FeatureExplorer>
-    <FeatureEngines>false</FeatureEngines>
-    <FeatureGitHub>false</FeatureGitHub>
+    <FeatureEngines>true</FeatureEngines>
+    <FeatureGitHub>true</FeatureGitHub>
     <FeatureKiSystem>false</FeatureKiSystem>
     <FeatureNetwork>false</FeatureNetwork>
     <FeatureSettings>false</FeatureSettings>
     <FeatureChat>false</FeatureChat>
     <FeatureDocker>false</FeatureDocker>
 
-    <!-- Services (optional, often tied to panels) -->
-    <FeatureAuth>false</FeatureAuth>
+    <!-- Services -->
+    <FeatureAuth>true</FeatureAuth>
   </PropertyGroup>
 
   <!-- DefineConstants from toggles -->
@@ -211,16 +211,8 @@
     <Compile Remove="Views\Chat\**\*.cs" />
   </ItemGroup>
 
-  <!--
-    WICHTIG:
-    Services NICHT mehr anhand von UI-Features rauswerfen.
-    Du wolltest "Panels ausblenden", nicht "Core-Typen wegsprengen".
-    Damit sind Publish/DI stabil, ohne Isolation-Datei-Hölle.
-  -->
-    <!-- ============================================================
-       SERVICES: quick isolation to keep "panels off" builds green
-       - Chat/Docker/Auth services depend on Views/Models that are removed when panels are off
-       - Network stays compiled because AppState depends on NetworkSession
+  <!-- ============================================================
+       SERVICES isolation
        ============================================================ -->
 
   <ItemGroup Condition="'$(FeatureChat)'!='true'">
@@ -234,14 +226,20 @@
   <ItemGroup Condition="'$(FeatureAuth)'!='true'">
     <Compile Remove="Services\Auth\**\*.cs" />
   </ItemGroup>
-  <!-- Network: wenn FeatureNetwork AUS, nur NetworkSession behalten (Core),
-       alle anderen Network-Implementierungen entfernen (vermeidet Docker-Abhängigkeit über NetworkHost) -->
+
+  <!--
+    Network:
+    Wenn FeatureNetwork AUS, wollen wir NUR die "Host/Api/Dtos"-Implementierungen loswerden,
+    aber Auth/GitHub braucht weiterhin GitHubDeviceFlow + WireGuardKeys.
+  -->
   <ItemGroup Condition="'$(FeatureNetwork)'!='true'">
-    <Compile Remove="Services\Network\GithubDeviceFlow.cs" />
     <Compile Remove="Services\Network\NetworkApiService.cs" />
     <Compile Remove="Services\Network\NetworkDtos.cs" />
     <Compile Remove="Services\Network\NetworkHost.cs" />
-    <Compile Remove="Services\Network\WireGuardKeys.cs" />
+    <!-- WICHTIG: NICHT entfernen:
+         Services\Network\GitHubDeviceFlow.cs
+         Services\Network\WireGuardKeys.cs
+    -->
   </ItemGroup>
 
 </Project>

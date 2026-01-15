@@ -3,6 +3,8 @@
              xmlns:views="clr-namespace:GatewayIDE.App.Views"
              xmlns:dash="clr-namespace:GatewayIDE.App.Views.Dashboard"
              xmlns:expl="clr-namespace:GatewayIDE.App.Views.Explorer"
+             xmlns:eng="clr-namespace:GatewayIDE.App.Views.Engines"
+             xmlns:gh="clr-namespace:GatewayIDE.App.Views.GitHub"
              x:Class="GatewayIDE.App.Views.Layout">
 
   <!-- Isolation Layout: nur LeftRail + Platzhalter -->
@@ -16,14 +18,26 @@
     <!-- Workspace -->
     <Grid Grid.Column="1" Margin="12" RowDefinitions="Auto,*">
       <TabControl>
+
         <TabItem Header="Explorer">
           <expl:ExplorerPanel />
         </TabItem>
+
         <TabItem Header="Dashboard">
           <dash:DashboardPanel />
         </TabItem>
+
+        <TabItem Header="Engines">
+          <eng:EnginesPanel />
+        </TabItem>
+
+        <TabItem Header="GitHub">
+          <gh:GitHubPanel />
+        </TabItem>
+
       </TabControl>
     </Grid>
+
 
     <!-- Statusbar (optional, aber stabil) -->
     <Border Grid.Row="1"
