@@ -7,9 +7,19 @@
     <Nullable>enable</Nullable>
     <AssemblyName>GatewayIDE.App</AssemblyName>
     <UseGrpc>false</UseGrpc>
+
+    <!-- ============================================================
+         ISOLATION SWITCH
+         true  => echte Services raus, Stubs bleiben drin
+         false => Stubs raus, echte Services wieder drin
+         ============================================================ -->
+    <IsIsolationMode>true</IsIsolationMode>
+
+    <!-- Flag für #if ISOLATION_MODE (optional, aber praktisch) -->
+    <DefineConstants>$(DefineConstants);ISOLATION_MODE</DefineConstants>
   </PropertyGroup>
 
-  <!-- EIN gemeinsamer Paketblock, keine Duplikate -->
+  <!-- Pakete -->
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.1.3" />
     <PackageReference Include="Avalonia.Desktop" Version="11.1.3" />
@@ -20,19 +30,44 @@
     <PackageReference Include="Grpc.Tools" Version="2.63.0" PrivateAssets="All" />
     <PackageReference Include="Grpc.Net.Client" Version="2.63.0" />
     <PackageReference Include="Google.Protobuf" Version="3.25.3" />
-    <!-- Network crypto -->
     <PackageReference Include="NSec.Cryptography" Version="24.4.0" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="9.0.0" />
   </ItemGroup>
 
-  <!-- XAML -->
+  <!-- ============================================================
+       XAML: ALLES AUS, DANN EINZELN WIEDER EIN
+       ============================================================ -->
+
+  <!-- 1) erst ALLE axaml raus (Xaml + Resource) -->
   <ItemGroup>
     <AvaloniaXaml Remove="**\*.axaml" />
     <AvaloniaResource Remove="**\*.axaml" />
   </ItemGroup>
 
+  <!-- 1b) axaml.cs auch raus, sonst partial/InitializeComponent Stress -->
   <ItemGroup>
-    <AvaloniaXaml Include="**\*.axaml" />
+    <Compile Remove="**\*.axaml.cs" />
+  </ItemGroup>
+
+  <!-- 2) Minimum rein -->
+  <ItemGroup>
+    <AvaloniaXaml Include="App.axaml" />
+    <AvaloniaXaml Include="MainWindow.axaml" />
+
+    <!-- Shell / Layout -->
+    <AvaloniaXaml Include="Views\Layout.axaml" />
+    <AvaloniaXaml Include="Views\LeftRail.axaml" />
+
+    <!-- PANELS: EINZELN AKTIVIEREN -->
+    <!-- <AvaloniaXaml Include="Views\Dashboard\DashboardPanel.axaml" /> -->
+    <!-- <AvaloniaXaml Include="Views\Docker\DockerPanel.axaml" /> -->
+    <!-- <AvaloniaXaml Include="Views\Explorer\ExplorerPanel.axaml" /> -->
+    <!-- <AvaloniaXaml Include="Views\Engines\EnginesPanel.axaml" /> -->
+    <!-- <AvaloniaXaml Include="Views\GitHub\GitHubPanel.axaml" /> -->
+    <!-- <AvaloniaXaml Include="Views\KiSystem\KiSystemPanel.axaml" /> -->
+    <!-- <AvaloniaXaml Include="Views\Network\NetworkPanel.axaml" /> -->
+    <!-- <AvaloniaXaml Include="Views\Settings\SettingsPanel.axaml" /> -->
+    <!-- <AvaloniaXaml Include="Views\Chat\SidePanel.axaml" /> -->
   </ItemGroup>
 
   <!-- Assets -->
@@ -40,5 +75,21 @@
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
 
+  <!-- ============================================================
+       CODE ISOLATION (WICHTIG: KEINE Compile Include, sonst NETSDK1022)
+       ============================================================ -->
+
+  <!-- Isolation ON: echte Services raus -->
+  <ItemGroup Condition="'$(IsIsolationMode)' == 'true'">
+    <Compile Remove="Services\Chat\ChatService.cs" />
+    <Compile Remove="Services\Docker\DockerService.cs" />
+    <Compile Remove="Services\Network\NetworkHost.cs" />
+  </ItemGroup>
+
+  <!-- Isolation OFF: Stub-Dateien raus -->
+  <ItemGroup Condition="'$(IsIsolationMode)' != 'true'">
+    <Compile Remove="Services\Chat\ChatService.Isolation.cs" />
+    <Compile Remove="Services\Docker\DockerService.Isolation.cs" />
+  </ItemGroup>
 
 </Project>

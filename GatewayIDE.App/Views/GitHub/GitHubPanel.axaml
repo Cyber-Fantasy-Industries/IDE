@@ -2,15 +2,136 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="GatewayIDE.App.Views.GitHub.GitHubPanel">
 
-  <Border Background="#121212" Padding="16">
-    <StackPanel Spacing="12">
-      <TextBlock Text="GITHUB" Foreground="#eaeaea" FontSize="18"/>
+  <!-- ========================= -->
+  <!-- STYLES                    -->
+  <!-- ========================= -->
+  <UserControl.Styles>
+    <Style Selector="Border.card">
+      <Setter Property="Background" Value="#141414"/>
+      <Setter Property="BorderBrush" Value="#2a2a2a"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="10"/>
+      <Setter Property="Padding" Value="12"/>
+    </Style>
 
-      <Button Content="Login mit GitHub"
-              Click="LoginButton_Click"
-              HorizontalAlignment="Left"
-              Margin="0,0,0,8"/>
-    </StackPanel>
-  </Border>
+    <Style Selector="TextBlock.h1">
+      <Setter Property="Foreground" Value="#eaeaea"/>
+      <Setter Property="FontSize" Value="18"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
 
+    <Style Selector="TextBlock.h2">
+      <Setter Property="Foreground" Value="#eaeaea"/>
+      <Setter Property="FontSize" Value="14"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+
+    <Style Selector="TextBlock.muted">
+      <Setter Property="Foreground" Value="#9a9a9a"/>
+      <Setter Property="FontSize" Value="12"/>
+    </Style>
+
+    <Style Selector="TextBlock.mono">
+      <Setter Property="FontFamily" Value="Consolas, Cascadia Mono, monospace"/>
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="Foreground" Value="#d8d8d8"/>
+    </Style>
+
+    <Style Selector="Button.action">
+      <Setter Property="Background" Value="#222"/>
+      <Setter Property="Foreground" Value="#eaeaea"/>
+      <Setter Property="BorderBrush" Value="#333"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="8"/>
+      <Setter Property="Padding" Value="10,6"/>
+      <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    <Style Selector="Button.action:pointerover">
+      <Setter Property="Background" Value="#2b2b2b"/>
+    </Style>
+  </UserControl.Styles>
+
+  <!-- ========================= -->
+  <!-- ROOT                      -->
+  <!-- ========================= -->
+  <Grid Background="#0f0f0f"
+        Margin="12"
+        RowDefinitions="Auto,12,Auto,12,*">
+
+    <!-- HEADER -->
+    <Border Classes="card">
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Classes="h1" Text="GitHub"/>
+
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+          <Button Classes="action" Content="Login"  Command="{Binding LoginCommand}"/>
+          <Button Classes="action" Content="Logout" Command="{Binding LogoutCommand}"/>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- ACCOUNT / REPO STATUS -->
+    <Border Grid.Row="2" Classes="card">
+      <Grid ColumnDefinitions="*,12,*">
+        <StackPanel Spacing="4">
+          <TextBlock Classes="h2" Text="Account"/>
+          <TextBlock Classes="muted" Text="{Binding UserName, StringFormat={}User: {0}}"/>
+          <TextBlock Classes="muted" Text="{Binding AuthState, StringFormat={}Auth: {0}}"/>
+        </StackPanel>
+
+        <StackPanel Grid.Column="2" Spacing="4">
+          <TextBlock Classes="h2" Text="Repository"/>
+          <TextBlock Classes="muted" Text="{Binding RepositoryName, StringFormat={}Repo: {0}}"/>
+          <TextBlock Classes="muted" Text="{Binding CurrentBranch,  StringFormat={}Branch: {0}}"/>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- ACTION BAR -->
+    <Border Grid.Row="4" Classes="card">
+      <Grid ColumnDefinitions="Auto,8,Auto,8,Auto,8,Auto">
+        <Button Classes="action" Content="Fetch"       Command="{Binding FetchCommand}"/>
+        <Button Grid.Column="2" Classes="action" Content="Pull"        Command="{Binding PullCommand}"/>
+        <Button Grid.Column="4" Classes="action" Content="Push"        Command="{Binding PushCommand}"/>
+        <Button Grid.Column="6" Classes="action" Content="Change Repo" Command="{Binding ChangeRepositoryCommand}"/>
+      </Grid>
+    </Border>
+
+    <!-- CHANGES / HISTORY -->
+    <Grid Grid.Row="6" ColumnDefinitions="*,12,*">
+      <Border Classes="card">
+        <Grid RowDefinitions="Auto,8,*">
+          <TextBlock Classes="h2" Text="Changes"/>
+          <ListBox Grid.Row="2" ItemsSource="{Binding Changes}">
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <StackPanel Spacing="2">
+                  <TextBlock Classes="mono" Text="{Binding Path}"/>
+                  <TextBlock Classes="muted" Text="{Binding Status}"/>
+                </StackPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </Grid>
+      </Border>
+
+      <Border Grid.Column="2" Classes="card">
+        <Grid RowDefinitions="Auto,8,*">
+          <TextBlock Classes="h2" Text="History"/>
+          <ListBox Grid.Row="2" ItemsSource="{Binding Commits}">
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <StackPanel Spacing="2">
+                  <TextBlock Classes="mono" Text="{Binding Message}"/>
+                  <TextBlock Classes="muted" Text="{Binding Author}"/>
+                  <TextBlock Classes="muted" Text="{Binding Date}"/>
+                </StackPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </Grid>
+      </Border>
+    </Grid>
+
+  </Grid>
 </UserControl>

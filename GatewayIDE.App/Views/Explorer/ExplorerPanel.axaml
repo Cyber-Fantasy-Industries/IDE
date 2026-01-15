@@ -91,7 +91,7 @@
           <TextBlock Classes="header" Text="Content Explorer"/>
           <TextBlock Grid.Column="1"
                      Classes="muted"
-                     Text="{Binding ContentItems.Count, StringFormat={}Items: {0}}"/>
+                     Text="{Binding ContentItems.Count, StringFormat=Items: \{0\}}"/>
         </Grid>
 
         <!-- Search -->

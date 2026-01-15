@@ -9,9 +9,13 @@ using GatewayIDE.App.Services.Chat;
 using GatewayIDE.App.Services.Network;
 
 using GatewayIDE.App.Views;
+
+#if !ISOLATION_MODE
 using GatewayIDE.App.Views.Chat;
 using GatewayIDE.App.Views.Docker;
 using GatewayIDE.App.Views.KiSystem;
+#endif
+
 namespace GatewayIDE.App;
 
 public static class AppBootstrap
@@ -21,14 +25,12 @@ public static class AppBootstrap
         var sc = new ServiceCollection();
 
         // =========================
-        // Core UI state
+        // Core UI state (immer)
         // =========================
         sc.AddSingleton<LayoutState>();
-        sc.AddSingleton<ThreadRouter>();
-        sc.AddSingleton<ChatState>();
 
         // =========================
-        // App / Settings / Registry
+        // App / Settings / Registry (immer)
         // =========================
         sc.AddSingleton<SettingsService>();
         sc.AddSingleton<GatewayIDEConfig>();   // optional: später aus SettingsService.Load() befüllen
@@ -36,7 +38,7 @@ public static class AppBootstrap
         sc.AddSingleton<AppState>();
 
         // =========================
-        // Network
+        // Network (immer)
         // =========================
         sc.AddSingleton<NetworkSession>();
 
@@ -49,13 +51,19 @@ public static class AppBootstrap
 
         sc.AddSingleton<NetworkApiService>();
 
-
-        // Feature services (falls Panels sie später brauchen)
+        // Feature services (immer – dürfen bleiben, auch ohne UI)
         sc.AddSingleton<AuthBootstrapService>();
         sc.AddSingleton<ChatService>();
 
+#if !ISOLATION_MODE
         // =========================
-        // Panel states
+        // Feature UI state (nur wenn nicht isoliert)
+        // =========================
+        sc.AddSingleton<ThreadRouter>();
+        sc.AddSingleton<ChatState>();
+
+        // =========================
+        // Panel states (nur wenn nicht isoliert)
         // =========================
         sc.AddSingleton<GatewayIDE.App.Views.Dashboard.DashboardPanelState>();
 
@@ -68,11 +76,12 @@ public static class AppBootstrap
         sc.AddSingleton<GatewayIDE.App.Views.KiSystem.KiSystemPanelState>();
         sc.AddSingleton<GatewayIDE.App.Views.Network.NetworkPanelState>();
         sc.AddSingleton<GatewayIDE.App.Views.Settings.SettingsPanelState>();
+#endif
 
-        // Commands
+        // =========================
+        // Commands + UI Root (immer)
+        // =========================
         sc.AddSingleton<MainCommands>();
-
-        // UI Root
         sc.AddSingleton<MainState>();
 
         return sc.BuildServiceProvider();

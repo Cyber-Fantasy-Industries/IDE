@@ -70,3 +70,12 @@ obj/
 *.lnk
 IDE-crash.log
 
+
+# GatewayIDE build / script artefacts
+build-win-crash.log
+_msbuildtmp/
+_buildlogs/
+CR/
+*-crash.log
+*_tmp/
+*_temp/

@@ -2,8 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using GatewayIDE.App.Views.Chat;
-using GatewayIDE.App.Views.KiSystem;
+
 using GatewayIDE.App.Views;
 
 namespace GatewayIDE.App.Commands;
@@ -11,15 +10,45 @@ namespace GatewayIDE.App.Commands;
 public sealed class MainCommands
 {
     private readonly LayoutState _layout;
-    private readonly ChatState _chat;
-    private readonly ThreadRouter _threads;
+
+#if !ISOLATION_MODE
+    private readonly GatewayIDE.App.Views.Chat.ChatState _chat;
+    private readonly GatewayIDE.App.Views.KiSystem.ThreadRouter _threads;
+#endif
 
     public ICommand ToggleChatCommand { get; }
     public ICommand SelectTabCommand { get; }
     public ICommand MenuActionCommand { get; }
     public ICommand SendChatCommand { get; }
 
-    public MainCommands(LayoutState layout, ChatState chat, ThreadRouter threads)
+#if ISOLATION_MODE
+    public MainCommands(LayoutState layout)
+    {
+        _layout = layout;
+
+        // Im Isolation Mode: Commands existieren, tun aber nichts Feature-spezifisches.
+        ToggleChatCommand = new AsyncCommand(_ => Task.CompletedTask);
+        SendChatCommand   = new AsyncCommand(_ => Task.CompletedTask);
+
+        MenuActionCommand = new AsyncCommand(p =>
+        {
+            var id = p?.ToString();
+            if (!string.IsNullOrWhiteSpace(id))
+                Console.WriteLine($"[MENU/ISOLATION] {id}");
+            return Task.CompletedTask;
+        });
+
+        SelectTabCommand = new AsyncCommand(p =>
+        {
+            _layout.Select(p?.ToString());
+            return Task.CompletedTask;
+        });
+    }
+#else
+    public MainCommands(
+        LayoutState layout,
+        GatewayIDE.App.Views.Chat.ChatState chat,
+        GatewayIDE.App.Views.KiSystem.ThreadRouter threads)
     {
         _layout = layout;
         _chat = chat;
@@ -30,7 +59,6 @@ public sealed class MainCommands
 
         MenuActionCommand = new AsyncCommand(p => OnMenuAction(p?.ToString()));
 
-        // ✅ nur Navigation
         SelectTabCommand = new AsyncCommand(p =>
         {
             _layout.Select(p?.ToString());
@@ -46,6 +74,7 @@ public sealed class MainCommands
 
         try { _threads.Append(ThreadId.T1, msg); } catch { }
     }
+#endif
 }
 
 public sealed class AsyncCommand : ICommand

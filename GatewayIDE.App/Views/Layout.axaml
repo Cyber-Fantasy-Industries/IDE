@@ -1,87 +1,55 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:views="clr-namespace:GatewayIDE.App.Views"
-             xmlns:dash="clr-namespace:GatewayIDE.App.Views.Dashboard"
-             xmlns:docker="clr-namespace:GatewayIDE.App.Views.Docker"
-             xmlns:explorer="clr-namespace:GatewayIDE.App.Views.Explorer"
-             xmlns:engines="clr-namespace:GatewayIDE.App.Views.Engines"
-             xmlns:github="clr-namespace:GatewayIDE.App.Views.GitHub"
-             xmlns:net="clr-namespace:GatewayIDE.App.Views.Network"
-             xmlns:settings="clr-namespace:GatewayIDE.App.Views.Settings"
-             xmlns:ki="clr-namespace:GatewayIDE.App.Views.KiSystem"
-             xmlns:chat="clr-namespace:GatewayIDE.App.Views.Chat"
              x:Class="GatewayIDE.App.Views.Layout">
 
-  <Grid ColumnDefinitions="56,Auto,*"
-        Background="#0f0f0f">
+  <!-- Isolation Layout: nur LeftRail + Platzhalter -->
+  <Grid Background="#0f0f0f"
+        ColumnDefinitions="56,*"
+        RowDefinitions="*,Auto">
 
-    <!-- LeftRail -->
+    <!-- LeftRail (muss in csproj aktiviert sein: Views\LeftRail.axaml) -->
     <views:LeftRail Grid.Column="0"/>
 
-    <!-- SidePanel -->
-    <chat:SidePanel Grid.Column="1"/>
+    <!-- Workspace placeholder -->
+    <Border Grid.Column="1"
+            Margin="12"
+            BorderBrush="#333"
+            BorderThickness="1"
+            CornerRadius="8"
+            Padding="12">
 
-    <!-- Workspace -->
-    <Grid Grid.Column="2"
-          Background="#0f0f0f">
+      <StackPanel Spacing="8">
+        <TextBlock Text="GatewayIDE – Isolation Mode"
+                   Foreground="#d8d8d8"
+                   FontSize="16"
+                   FontWeight="SemiBold"/>
 
-      <!-- DASHBOARD -->
-      <Border IsVisible="{Binding Layout.IsDashboard, FallbackValue=False}">
-        <dash:DashboardPanel DataContext="{Binding Dashboard}" />
-      </Border>
+        <TextBlock Foreground="#aaaaaa"
+                   TextWrapping="Wrap">
+          Panels sind aktuell deaktiviert. Aktiviere sie einzeln in GatewayIDE.App.csproj
+          (AvaloniaXaml Include=...) und ersetze danach Layout.axaml wieder durch die volle Version.
+        </TextBlock>
 
-      <!-- DOCKER -->
-      <Border IsVisible="{Binding Layout.IsDocker, FallbackValue=False}">
-        <docker:DockerPanel DataContext="{Binding Docker}" />
-      </Border>
+        <TextBlock Foreground="#888888"
+                   TextWrapping="Wrap">
+          Tipp: Wenn du ein Panel aktivierst, musst du sowohl das Panel.axaml includen
+          als auch sicherstellen, dass Layout.axaml dieses Panel überhaupt referenziert.
+        </TextBlock>
+      </StackPanel>
+    </Border>
 
-      <!-- NETWORK -->
-      <Border IsVisible="{Binding Layout.IsNetwork, FallbackValue=False}">
-        <net:NetworkPanel DataContext="{Binding Network}" />
-      </Border>
+    <!-- Statusbar (optional, aber stabil) -->
+    <Border Grid.Row="1"
+            Grid.ColumnSpan="2"
+            Background="#111"
+            BorderBrush="#222"
+            BorderThickness="1,1,0,0"
+            Padding="8">
 
-      <!-- EXPLORER -->
-      <Border IsVisible="{Binding Layout.IsExplorer, FallbackValue=False}">
-        <explorer:ExplorerPanel DataContext="{Binding Explorer}" />
-      </Border>
+      <TextBlock Text="Status: isolation"
+                 Foreground="#aaaaaa"/>
+    </Border>
 
-      <!-- ENGINES -->
-      <Border IsVisible="{Binding Layout.IsEngines, FallbackValue=False}">
-        <engines:EnginesPanel DataContext="{Binding Engines}" />
-      </Border>
-
-      <!-- GITHUB -->
-      <Border IsVisible="{Binding Layout.IsGitHub, FallbackValue=False}">
-        <github:GitHubPanel DataContext="{Binding GitHub}" />
-      </Border>
-
-      <!-- KI SYSTEM -->
-      <Border IsVisible="{Binding Layout.IsKiSystem, FallbackValue=False}">
-        <ki:KiSystemPanel DataContext="{Binding KiSystem}" />
-      </Border>
-
-      <!-- SETTINGS -->
-      <Border IsVisible="{Binding Layout.IsSettings, FallbackValue=False}">
-        <settings:SettingsPanel DataContext="{Binding Settings}" />
-      </Border>
-
-      <!-- FALLBACK -->
-      <Border IsVisible="{Binding Layout.IsNone, FallbackValue=True}"
-              BorderBrush="#444"
-              BorderThickness="1"
-              Margin="12"
-              Padding="12"
-              Background="#141414">
-        <StackPanel Spacing="6">
-          <TextBlock Foreground="#fff"
-                     FontSize="16"
-                     FontWeight="SemiBold"
-                     Text="⚠ Kein Panel aktiv (Tab-Mismatch)"/>
-          <TextBlock Foreground="#ddd"
-                     Text="{Binding Layout.ActiveTab, StringFormat='ActiveTab: {0}'}"/>
-        </StackPanel>
-      </Border>
-
-    </Grid>
   </Grid>
 </UserControl>

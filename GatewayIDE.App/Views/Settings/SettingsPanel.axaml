@@ -1,9 +1,321 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="GatewayIDE.App.Views.Settings.SettingsPanel">
-  <Border Background="#121212" Padding="16">
-    <TextBlock Text="SETTINGS"
-               Foreground="#eaeaea"
-               FontSize="18"/>
-  </Border>
+
+  <UserControl.Styles>
+
+    <!-- Card -->
+    <Style Selector="Border.card">
+      <Setter Property="Background" Value="#141414"/>
+      <Setter Property="BorderBrush" Value="#2a2a2a"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="12"/>
+      <Setter Property="Padding" Value="14"/>
+    </Style>
+
+    <!-- Text -->
+    <Style Selector="TextBlock.h1">
+      <Setter Property="Foreground" Value="#eaeaea"/>
+      <Setter Property="FontSize" Value="18"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+
+    <Style Selector="TextBlock.h2">
+      <Setter Property="Foreground" Value="#eaeaea"/>
+      <Setter Property="FontSize" Value="14"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+
+    <Style Selector="TextBlock.muted">
+      <Setter Property="Foreground" Value="#9a9a9a"/>
+      <Setter Property="FontSize" Value="12"/>
+    </Style>
+
+    <Style Selector="TextBlock.mono">
+      <Setter Property="FontFamily" Value="Consolas, Cascadia Mono, monospace"/>
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="Foreground" Value="#d8d8d8"/>
+    </Style>
+
+    <!-- Inputs -->
+    <Style Selector="TextBox.field">
+      <Setter Property="Background" Value="#101010"/>
+      <Setter Property="BorderBrush" Value="#2a2a2a"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="10"/>
+      <Setter Property="Padding" Value="10,7"/>
+      <Setter Property="Foreground" Value="#eaeaea"/>
+      <Setter Property="WatermarkForeground" Value="#7a7a7a"/>
+    </Style>
+
+    <Style Selector="ComboBox.field">
+      <Setter Property="Background" Value="#101010"/>
+      <Setter Property="BorderBrush" Value="#2a2a2a"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="10"/>
+      <Setter Property="Padding" Value="10,6"/>
+      <Setter Property="Foreground" Value="#eaeaea"/>
+    </Style>
+
+    <Style Selector="CheckBox.field">
+      <Setter Property="Foreground" Value="#eaeaea"/>
+    </Style>
+
+    <!-- Buttons -->
+    <Style Selector="Button.action">
+      <Setter Property="Background" Value="#222"/>
+      <Setter Property="Foreground" Value="#eaeaea"/>
+      <Setter Property="BorderBrush" Value="#333"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="10"/>
+      <Setter Property="Padding" Value="12,7"/>
+      <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    <Style Selector="Button.action:pointerover">
+      <Setter Property="Background" Value="#2b2b2b"/>
+    </Style>
+
+    <!-- TabControl look -->
+    <Style Selector="TabControl">
+      <Setter Property="Background" Value="Transparent"/>
+    </Style>
+
+    <Style Selector="TabItem">
+      <Setter Property="Foreground" Value="#cfcfcf"/>
+      <Setter Property="Background" Value="#111"/>
+      <Setter Property="BorderBrush" Value="#2a2a2a"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="10,10,0,0"/>
+      <Setter Property="Padding" Value="12,8"/>
+      <Setter Property="Margin" Value="0,0,8,0"/>
+    </Style>
+
+    <Style Selector="TabItem:selected">
+      <Setter Property="Foreground" Value="#ffffff"/>
+      <Setter Property="Background" Value="#1a1a1a"/>
+    </Style>
+
+    <!-- Rows -->
+    <Style Selector="Border.row">
+      <Setter Property="Background" Value="#101010"/>
+      <Setter Property="BorderBrush" Value="#242424"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="10"/>
+      <Setter Property="Padding" Value="10"/>
+    </Style>
+
+  </UserControl.Styles>
+
+  <Grid Background="#0f0f0f" Margin="12"
+        RowDefinitions="Auto,12,*">
+
+    <!-- Header -->
+    <Border Grid.Row="0" Classes="card">
+      <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,6,Auto">
+        <TextBlock Classes="h1" Text="Settings"/>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+          <Button Classes="action" Content="Save" Command="{Binding SaveCommand}"/>
+          <Button Classes="action" Content="Reset" Command="{Binding ResetCommand}"/>
+        </StackPanel>
+        <TextBlock Grid.Row="2" Classes="muted"
+                   Text="General • Editor • Services (Service-spezifische Settings erscheinen automatisch nach Installation)"/>
+      </Grid>
+    </Border>
+
+    <!-- Tabs -->
+    <Border Grid.Row="2" Classes="card">
+      <TabControl SelectedIndex="{Binding SelectedTabIndex}">
+        <TabItem Header="General">
+          <ScrollViewer>
+            <StackPanel Spacing="12">
+
+              <TextBlock Classes="h2" Text="General Settings"/>
+
+              <Grid ColumnDefinitions="200,12,*"
+                    RowDefinitions="Auto,10,Auto,10,Auto,10,Auto,10,Auto">
+
+                <TextBlock Text="Workspace Path" Classes="muted"/>
+                <TextBox Grid.Column="2" Classes="field"
+                         Text="{Binding General.WorkspacePath}"
+                         Watermark="C:\Projects\IDE"/>
+
+                <TextBlock Grid.Row="2" Text="Theme" Classes="muted"/>
+                <ComboBox Grid.Row="2" Grid.Column="2" Classes="field"
+                          ItemsSource="{Binding General.ThemeOptions}"
+                          SelectedItem="{Binding General.SelectedTheme}"/>
+
+                <TextBlock Grid.Row="4" Text="Language" Classes="muted"/>
+                <ComboBox Grid.Row="4" Grid.Column="2" Classes="field"
+                          ItemsSource="{Binding General.LanguageOptions}"
+                          SelectedItem="{Binding General.SelectedLanguage}"/>
+
+                <TextBlock Grid.Row="6" Text="Auto Start Services" Classes="muted"/>
+                <CheckBox Grid.Row="6" Grid.Column="2" Classes="field"
+                          IsChecked="{Binding General.AutoStartServices}"
+                          Content="Start backend/services when IDE starts"/>
+
+                <TextBlock Grid.Row="8" Text="Telemetry" Classes="muted"/>
+                <CheckBox Grid.Row="8" Grid.Column="2" Classes="field"
+                          IsChecked="{Binding General.TelemetryEnabled}"
+                          Content="Allow anonymous usage telemetry"/>
+              </Grid>
+
+              <Border Classes="row">
+                <StackPanel Spacing="4">
+                  <TextBlock Classes="h2" Text="Info"/>
+                  <TextBlock Classes="muted"
+                             Text="{Binding General.InfoText, FallbackValue=Hier später: Updates, Backup/Restore, Default Paths.}"/>
+                </StackPanel>
+              </Border>
+
+            </StackPanel>
+          </ScrollViewer>
+        </TabItem>
+
+        <TabItem Header="Editor">
+          <ScrollViewer>
+            <StackPanel Spacing="12">
+
+              <TextBlock Classes="h2" Text="Editor Settings"/>
+
+              <Grid ColumnDefinitions="200,12,*"
+                    RowDefinitions="Auto,10,Auto,10,Auto,10,Auto,10,Auto,10,Auto">
+
+                <TextBlock Text="Font Family" Classes="muted"/>
+                <TextBox Grid.Column="2" Classes="field"
+                         Text="{Binding Editor.FontFamily}"
+                         Watermark="Cascadia Mono"/>
+
+                <TextBlock Grid.Row="2" Text="Font Size" Classes="muted"/>
+                <TextBox Grid.Row="2" Grid.Column="2" Classes="field"
+                         Text="{Binding Editor.FontSize}"
+                         Watermark="13"/>
+
+                <TextBlock Grid.Row="4" Text="Tab Size" Classes="muted"/>
+                <TextBox Grid.Row="4" Grid.Column="2" Classes="field"
+                         Text="{Binding Editor.TabSize}"
+                         Watermark="4"/>
+
+                <TextBlock Grid.Row="6" Text="Auto Save" Classes="muted"/>
+                <CheckBox Grid.Row="6" Grid.Column="2" Classes="field"
+                          IsChecked="{Binding Editor.AutoSave}"
+                          Content="Save files automatically"/>
+
+                <TextBlock Grid.Row="8" Text="Format on Save" Classes="muted"/>
+                <CheckBox Grid.Row="8" Grid.Column="2" Classes="field"
+                          IsChecked="{Binding Editor.FormatOnSave}"
+                          Content="Run formatter on save"/>
+
+                <TextBlock Grid.Row="10" Text="Word Wrap" Classes="muted"/>
+                <CheckBox Grid.Row="10" Grid.Column="2" Classes="field"
+                          IsChecked="{Binding Editor.WordWrap}"
+                          Content="Wrap long lines"/>
+              </Grid>
+
+              <Border Classes="row">
+                <StackPanel Spacing="4">
+                  <TextBlock Classes="h2" Text="Keybindings (später)"/>
+                  <TextBlock Classes="muted"
+                             Text="Hier später: Keymap (VSCode/Rider), Custom shortcuts, Editor profiles."/>
+                </StackPanel>
+              </Border>
+
+            </StackPanel>
+          </ScrollViewer>
+        </TabItem>
+
+        <TabItem Header="Services">
+          <Grid ColumnDefinitions="320,12,*">
+
+            <!-- Left: service list -->
+            <Border Grid.Column="0" Background="#101010" BorderBrush="#222" BorderThickness="1" CornerRadius="10" Padding="10">
+              <Grid RowDefinitions="Auto,10,Auto,10,*">
+
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Classes="h2" Text="Installed Services"/>
+                  <TextBlock Grid.Column="1" Classes="muted"
+                             Text="{Binding Services.Items.Count, StringFormat=Count: \{0\}}"/>
+                </Grid>
+
+                <TextBox Grid.Row="2" Classes="field"
+                         Text="{Binding Services.Search}"
+                         Watermark="Search services…"/>
+
+                <ListBox Grid.Row="4"
+                         ItemsSource="{Binding Services.Items}"
+                         SelectedItem="{Binding Services.Selected}">
+                  <ListBox.ItemTemplate>
+                    <DataTemplate>
+                      <Border Classes="row" Margin="0,0,0,8">
+                        <StackPanel Spacing="2">
+                          <TextBlock Classes="mono" Text="{Binding Name}"/>
+                          <TextBlock Classes="muted" Text="{Binding StatusText}"/>
+                          <TextBlock Classes="muted" Text="{Binding Version, StringFormat=Version: \{0\}}"/>
+                        </StackPanel>
+                      </Border>
+                    </DataTemplate>
+                  </ListBox.ItemTemplate>
+                </ListBox>
+
+              </Grid>
+            </Border>
+
+            <!-- Right: selected service settings -->
+            <Border Grid.Column="2" Background="#101010" BorderBrush="#222" BorderThickness="1" CornerRadius="10" Padding="12">
+              <Grid RowDefinitions="Auto,10,Auto,10,*,10,Auto">
+
+                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto">
+                  <TextBlock Classes="h2" Text="Service Settings"/>
+                  <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                    <Button Classes="action" Content="Reload"
+                            Command="{Binding ReloadServiceSettingsCommand}"/>
+                    <Button Classes="action" Content="Apply"
+                            Command="{Binding ApplyServiceSettingsCommand}"/>
+                  </StackPanel>
+                </Grid>
+
+                <StackPanel Grid.Row="2" Spacing="4">
+                  <TextBlock Classes="mono" Text="{Binding Services.Selected.Name, FallbackValue=(no service selected)}"/>
+                  <TextBlock Classes="muted" Text="{Binding Services.Selected.Description, FallbackValue=}"/>
+                </StackPanel>
+
+                <!-- ENV/Config -->
+                <Border Grid.Row="4" BorderBrush="#222" BorderThickness="1" CornerRadius="10" Padding="10" Background="#0f0f0f">
+                  <Grid RowDefinitions="Auto,10,*">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <TextBlock Classes="h2" Text="ENV / Config"/>
+                      <TextBlock Grid.Column="1" Classes="muted"
+                                 Text="{Binding Services.Selected.Settings.Count, StringFormat=Keys: \{0\}}"/>
+                    </Grid>
+
+                    <ScrollViewer Grid.Row="2">
+                      <ItemsControl ItemsSource="{Binding Services.Selected.Settings}">
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate>
+                            <Grid ColumnDefinitions="220,10,*" RowDefinitions="Auto,8">
+                              <TextBlock Classes="mono" Text="{Binding Key}"/>
+                              <TextBox Grid.Column="2" Classes="field" Text="{Binding Value}" Watermark="value"/>
+                              <Border Grid.Row="1" Grid.ColumnSpan="3" Height="1" Background="#1b1b1b"/>
+                            </Grid>
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                    </ScrollViewer>
+                  </Grid>
+                </Border>
+
+                <StackPanel Grid.Row="6" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                  <Button Classes="action" Content="Open Logs" Command="{Binding OpenServiceLogsCommand}"/>
+                </StackPanel>
+
+              </Grid>
+            </Border>
+
+          </Grid>
+        </TabItem>
+
+      </TabControl>
+    </Border>
+
+  </Grid>
 </UserControl>

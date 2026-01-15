@@ -1,16 +1,16 @@
 using GatewayIDE.App.Commands;
 using GatewayIDE.App.Views;
-using GatewayIDE.App.Views.Chat;
-using GatewayIDE.App.Views.KiSystem;
 
 namespace GatewayIDE.App;
 
 public sealed class MainState
 {
     public LayoutState Layout { get; }
-    public ChatState Chat { get; }
-    public ThreadRouter Threads { get; }
     public MainCommands Commands { get; }
+
+#if !ISOLATION_MODE
+    public GatewayIDE.App.Views.Chat.ChatState Chat { get; }
+    public GatewayIDE.App.Views.KiSystem.ThreadRouter Threads { get; }
 
     public GatewayIDE.App.Views.Dashboard.DashboardPanelState Dashboard { get; }
     public GatewayIDE.App.Views.Docker.DockerPanelState Docker { get; }
@@ -20,11 +20,19 @@ public sealed class MainState
     public GatewayIDE.App.Views.KiSystem.KiSystemPanelState KiSystem { get; }
     public GatewayIDE.App.Views.Network.NetworkPanelState Network { get; }
     public GatewayIDE.App.Views.Settings.SettingsPanelState Settings { get; }
+#endif
 
+#if ISOLATION_MODE
+    public MainState(LayoutState layout, MainCommands commands)
+    {
+        Layout = layout;
+        Commands = commands;
+    }
+#else
     public MainState(
         LayoutState layout,
-        ChatState chat,
-        ThreadRouter threads,
+        GatewayIDE.App.Views.Chat.ChatState chat,
+        GatewayIDE.App.Views.KiSystem.ThreadRouter threads,
         MainCommands commands,
         GatewayIDE.App.Views.Dashboard.DashboardPanelState dashboard,
         GatewayIDE.App.Views.Docker.DockerPanelState docker,
@@ -36,9 +44,10 @@ public sealed class MainState
         GatewayIDE.App.Views.Settings.SettingsPanelState settings)
     {
         Layout = layout;
+        Commands = commands;
+
         Chat = chat;
         Threads = threads;
-        Commands = commands;
 
         Dashboard = dashboard;
         Docker = docker;
@@ -49,4 +58,5 @@ public sealed class MainState
         Network = network;
         Settings = settings;
     }
+#endif
 }
