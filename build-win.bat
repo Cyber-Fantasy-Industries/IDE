@@ -396,11 +396,18 @@ exit /b 0
 :FAIL_HARD
 echo.
 echo ============================================
-echo   BUILD ABGEBROCHEN
+echo   BUILD ABGEBROCHEN (HARD FAIL)
 echo   Crashlog: %CRASHLOG%
+echo   Letzter LOG: %LOG%
 echo ============================================
 >>"%CRASHLOG%" echo %date% %time% - HARD FAIL
+
+if defined LOG if exist "%LOG%" (
+  call :SHOW_FAIL "%LOG%"
+)
+
 goto :RETRY
+
 
 
 :RETRY
