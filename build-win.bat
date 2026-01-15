@@ -220,6 +220,29 @@ rem ============================================================
 :DOTNET_CHECK
 echo [RUN] .NET SDK check
 
+rem 1) Normaler PATH-Check
+where dotnet >nul 2>&1
+if errorlevel 1 (
+  rem 2) Fallback A: User-local Install
+  if exist "%LOCALAPPDATA%\Microsoft\dotnet\dotnet.exe" (
+    set "PATH=%LOCALAPPDATA%\Microsoft\dotnet;%LOCALAPPDATA%\Microsoft\dotnet\tools;%PATH%"
+  ) else (
+    rem 3) Fallback B: Systemweit (typisch)
+    if exist "%ProgramFiles%\dotnet\dotnet.exe" (
+      set "PATH=%ProgramFiles%\dotnet;%PATH%"
+    )
+  )
+)
+
+rem 3) Nochmal pruefen
+where dotnet >nul 2>&1
+if errorlevel 1 (
+  echo [ABORT] dotnet.exe nicht im PATH gefunden
+  echo [HINT] Installiere .NET 8+ SDK: https://aka.ms/dotnet/download
+  exit /b 1
+)
+
+rem 4) Nochmal pruefen
 where dotnet >nul 2>&1
 if errorlevel 1 (
   echo [ABORT] dotnet.exe nicht im PATH gefunden
@@ -276,37 +299,69 @@ echo.
 echo ============================================
 echo   .NET SDK wird benoetigt
 echo ============================================
-echo GatewayIDE.App targetet .NET 8.0 (SDK >= 8 erforderlich)
+echo GatewayIDE.App targetet .NET 8 (SDK >= 8 erforderlich)
 echo Auf diesem System wurde kein SDK >= 8 gefunden
 echo.
+
 set /p INSTALLDOTNET="Soll .NET 8 SDK jetzt installiert werden? (Y/N): "
+if /I "%INSTALLDOTNET%" NEQ "Y" exit /b 1
 
-if /I "%INSTALLDOTNET%" NEQ "Y" (
-  exit /b 1
-)
+rem --------------------------------------------
+rem Architektur bestimmen (x64 vs arm64)
+rem --------------------------------------------
+set "DOTNET_ARCH=x64"
+if /I "%PROCESSOR_ARCHITECTURE%"=="ARM64" set "DOTNET_ARCH=arm64"
 
-set "DOTNET_EXE=%TEMP%\dotnet-sdk-8.exe"
+rem --------------------------------------------
+rem Download dotnet-install.ps1 (stabiler Microsoft-Source)
+rem --------------------------------------------
+set "INSTALLPS1=%SAFE_TEMP%\dotnet-install.ps1"
 
-rem Beispiel: SDK 8.0.100 (win-x64). Link bei Bedarf aktualisieren.
-set "DOTNET_URL=https://download.visualstudio.microsoft.com/download/pr/0c1b7d1c-0b7e-4a2e-8b91-bbe3a2a5c7c1/5fbd6cce91e3a31e1a6c7b9cbb1d62df/dotnet-sdk-8.0.100-win-x64.exe"
+echo [DL] Lade dotnet-install.ps1 nach: "%INSTALLPS1%"
 
-echo.
-echo [DL] Lade .NET 8 SDK Installer nach: %DOTNET_EXE%
-powershell -NoProfile -Command "try{Invoke-WebRequest -Uri '%DOTNET_URL%' -OutFile '%DOTNET_EXE%' -UseBasicParsing; exit 0}catch{Write-Host $_; exit 1}"
+powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+  "try { ^
+      $u='https://dot.net/v1/dotnet-install.ps1'; ^
+      Invoke-WebRequest -Uri $u -OutFile '%INSTALLPS1%' -UseBasicParsing; ^
+      exit 0 ^
+   } catch { ^
+      Write-Host $_; exit 1 ^
+   }"
 if errorlevel 1 (
-  echo [ABORT] Download fehlgeschlagen
+  echo [ABORT] Download dotnet-install.ps1 fehlgeschlagen
   echo [HINT] Bitte manuell installieren: https://aka.ms/dotnet/download
   exit /b 1
 )
 
-echo.
-echo [RUN] Starte Installer
-start "" "%DOTNET_EXE%"
+rem --------------------------------------------
+rem Installiere SDK Channel 8.0 fuer aktuelle Architektur
+rem -InstallDir: User-local, keine Adminrechte notwendig
+rem Danach PATH fuer diese Session anpassen
+rem --------------------------------------------
+set "DOTNET_INSTALL_DIR=%LOCALAPPDATA%\Microsoft\dotnet"
+
+echo [RUN] Installiere .NET SDK 8.0 (Arch=%DOTNET_ARCH%) nach "%DOTNET_INSTALL_DIR%"
+powershell -NoProfile -ExecutionPolicy Bypass -File "%INSTALLPS1%" ^
+  -Channel 8.0 ^
+  -Architecture %DOTNET_ARCH% ^
+  -InstallDir "%DOTNET_INSTALL_DIR%" ^
+  -NoPath
+
+if errorlevel 1 (
+  echo [ABORT] dotnet-install.ps1 Installation fehlgeschlagen
+  echo [HINT] Bitte manuell installieren: https://aka.ms/dotnet/download
+  exit /b 1
+)
+
+rem PATH fuer diese Session (damit dotnet sofort gefunden wird)
+set "PATH=%DOTNET_INSTALL_DIR%;%DOTNET_INSTALL_DIR%\tools;%PATH%"
 
 echo.
-echo [INFO] Bitte Installation abschliessen
-echo [INFO] Danach Script erneut starten (oder Taste druecken um erneut zu pruefen)
-pause >nul
+echo [OK] Installation durchgefuehrt.
+echo [INFO] Re-Check: dotnet --info
+dotnet --info
+echo.
+pause
 exit /b 0
 
 

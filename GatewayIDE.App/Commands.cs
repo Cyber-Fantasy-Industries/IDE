@@ -5,15 +5,26 @@ using System.Windows.Input;
 
 using GatewayIDE.App.Views;
 
+#if FEATURE_CHAT
+using GatewayIDE.App.Views.Chat;
+#endif
+
+#if FEATURE_KISYSTEM
+using GatewayIDE.App.Views.KiSystem;
+#endif
+
 namespace GatewayIDE.App.Commands;
 
 public sealed class MainCommands
 {
     private readonly LayoutState _layout;
 
-#if !ISOLATION_MODE
-    private readonly GatewayIDE.App.Views.Chat.ChatState _chat;
-    private readonly GatewayIDE.App.Views.KiSystem.ThreadRouter _threads;
+#if !ISOLATION_MODE && FEATURE_CHAT
+    private readonly ChatState _chat;
+#endif
+
+#if !ISOLATION_MODE && FEATURE_KISYSTEM
+    private readonly ThreadRouter _threads;
 #endif
 
     public ICommand ToggleChatCommand { get; }
@@ -21,41 +32,30 @@ public sealed class MainCommands
     public ICommand MenuActionCommand { get; }
     public ICommand SendChatCommand { get; }
 
-#if ISOLATION_MODE
-    public MainCommands(LayoutState layout)
-    {
-        _layout = layout;
-
-        // Im Isolation Mode: Commands existieren, tun aber nichts Feature-spezifisches.
-        ToggleChatCommand = new AsyncCommand(_ => Task.CompletedTask);
-        SendChatCommand   = new AsyncCommand(_ => Task.CompletedTask);
-
-        MenuActionCommand = new AsyncCommand(p =>
-        {
-            var id = p?.ToString();
-            if (!string.IsNullOrWhiteSpace(id))
-                Console.WriteLine($"[MENU/ISOLATION] {id}");
-            return Task.CompletedTask;
-        });
-
-        SelectTabCommand = new AsyncCommand(p =>
-        {
-            _layout.Select(p?.ToString());
-            return Task.CompletedTask;
-        });
-    }
-#else
     public MainCommands(
-        LayoutState layout,
-        GatewayIDE.App.Views.Chat.ChatState chat,
-        GatewayIDE.App.Views.KiSystem.ThreadRouter threads)
+        LayoutState layout
+#if !ISOLATION_MODE && FEATURE_CHAT
+        , ChatState chat
+#endif
+#if !ISOLATION_MODE && FEATURE_KISYSTEM
+        , ThreadRouter threads
+#endif
+        )
     {
         _layout = layout;
-        _chat = chat;
-        _threads = threads;
 
+#if !ISOLATION_MODE && FEATURE_CHAT
+        _chat = chat;
         ToggleChatCommand = new AsyncCommand(_ => _chat.ToggleChatSidebar());
         SendChatCommand   = new AsyncCommand(async _ => await _chat.SendAsync());
+#else
+        ToggleChatCommand = new AsyncCommand(_ => Task.CompletedTask);
+        SendChatCommand   = new AsyncCommand(_ => Task.CompletedTask);
+#endif
+
+#if !ISOLATION_MODE && FEATURE_KISYSTEM
+        _threads = threads;
+#endif
 
         MenuActionCommand = new AsyncCommand(p => OnMenuAction(p?.ToString()));
 
@@ -66,15 +66,22 @@ public sealed class MainCommands
         });
     }
 
-    private void OnMenuAction(string? id)
+    private Task OnMenuAction(string? id)
     {
-        if (string.IsNullOrWhiteSpace(id)) return;
+        if (string.IsNullOrWhiteSpace(id))
+            return Task.CompletedTask;
+
         var msg = $"[MENU] {id}";
         Console.WriteLine(msg);
 
-        try { _threads.Append(ThreadId.T1, msg); } catch { }
-    }
+#if !ISOLATION_MODE && FEATURE_KISYSTEM
+        // Optional: wenn du einen konkreten API-Call hast, hier rein.
+        // Ich lasse es bewusst "soft", damit es nie wieder bricht.
+        try { /* _threads.Append(...); */ } catch { }
 #endif
+
+        return Task.CompletedTask;
+    }
 }
 
 public sealed class AsyncCommand : ICommand

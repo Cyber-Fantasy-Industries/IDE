@@ -1,4 +1,3 @@
-<!-- GatewayIDE.App/GatewayIDE.App.csproj -->
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -9,14 +8,74 @@
     <UseGrpc>false</UseGrpc>
 
     <!-- ============================================================
-         ISOLATION SWITCH
-         true  => echte Services raus, Stubs bleiben drin
-         false => Stubs raus, echte Services wieder drin
+         ISOLATION / FEATURE TOGGLES
+         - true  = compile + include XAML + wire DI
+         - false = views removed from Compile (no InitializeComponent issues)
          ============================================================ -->
+
+    <!-- Start safe: isolate + minimal shell -->
     <IsIsolationMode>true</IsIsolationMode>
 
-    <!-- Flag für #if ISOLATION_MODE (optional, aber praktisch) -->
+    <!-- Minimal shell -->
+    <FeatureLayout>true</FeatureLayout>
+    <FeatureLeftRail>true</FeatureLeftRail>
+
+    <!-- Panels -->
+    <FeatureDashboard>false</FeatureDashboard>
+    <FeatureExplorer>false</FeatureExplorer>
+    <FeatureEngines>false</FeatureEngines>
+    <FeatureGitHub>false</FeatureGitHub>
+    <FeatureKiSystem>false</FeatureKiSystem>
+    <FeatureNetwork>false</FeatureNetwork>
+    <FeatureSettings>false</FeatureSettings>
+    <FeatureChat>false</FeatureChat>
+    <FeatureDocker>false</FeatureDocker>
+
+    <!-- Services (optional, often tied to panels) -->
+    <FeatureAuth>false</FeatureAuth>
+  </PropertyGroup>
+
+  <!-- DefineConstants from toggles -->
+  <PropertyGroup Condition="'$(IsIsolationMode)'=='true'">
     <DefineConstants>$(DefineConstants);ISOLATION_MODE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(FeatureLayout)'=='true'">
+    <DefineConstants>$(DefineConstants);FEATURE_LAYOUT</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(FeatureLeftRail)'=='true'">
+    <DefineConstants>$(DefineConstants);FEATURE_LEFTRAIL</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(FeatureDashboard)'=='true'">
+    <DefineConstants>$(DefineConstants);FEATURE_DASHBOARD</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(FeatureExplorer)'=='true'">
+    <DefineConstants>$(DefineConstants);FEATURE_EXPLORER</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(FeatureEngines)'=='true'">
+    <DefineConstants>$(DefineConstants);FEATURE_ENGINES</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(FeatureGitHub)'=='true'">
+    <DefineConstants>$(DefineConstants);FEATURE_GITHUB</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(FeatureKiSystem)'=='true'">
+    <DefineConstants>$(DefineConstants);FEATURE_KISYSTEM</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(FeatureNetwork)'=='true'">
+    <DefineConstants>$(DefineConstants);FEATURE_NETWORK</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(FeatureSettings)'=='true'">
+    <DefineConstants>$(DefineConstants);FEATURE_SETTINGS</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(FeatureChat)'=='true'">
+    <DefineConstants>$(DefineConstants);FEATURE_CHAT</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(FeatureDocker)'=='true'">
+    <DefineConstants>$(DefineConstants);FEATURE_DOCKER</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(FeatureAuth)'=='true'">
+    <DefineConstants>$(DefineConstants);FEATURE_AUTH</DefineConstants>
   </PropertyGroup>
 
   <!-- Pakete -->
@@ -35,39 +94,65 @@
   </ItemGroup>
 
   <!-- ============================================================
-       XAML: ALLES AUS, DANN EINZELN WIEDER EIN
+       XAML: Start clean, then include by feature
        ============================================================ -->
 
-  <!-- 1) erst ALLE axaml raus (Xaml + Resource) -->
+  <!-- Remove all axaml by default -->
   <ItemGroup>
     <AvaloniaXaml Remove="**\*.axaml" />
     <AvaloniaResource Remove="**\*.axaml" />
   </ItemGroup>
 
-  <!-- 1b) axaml.cs auch raus, sonst partial/InitializeComponent Stress -->
-  <ItemGroup>
-    <Compile Remove="**\*.axaml.cs" />
-  </ItemGroup>
-
-  <!-- 2) Minimum rein -->
+  <!-- Minimum always -->
   <ItemGroup>
     <AvaloniaXaml Include="App.axaml" />
     <AvaloniaXaml Include="MainWindow.axaml" />
+  </ItemGroup>
 
-    <!-- Shell / Layout -->
+  <!-- Shell -->
+  <ItemGroup Condition="'$(FeatureLayout)'=='true'">
     <AvaloniaXaml Include="Views\Layout.axaml" />
-    <AvaloniaXaml Include="Views\LeftRail.axaml" />
+  </ItemGroup>
 
-    <!-- PANELS: EINZELN AKTIVIEREN -->
-    <!-- <AvaloniaXaml Include="Views\Dashboard\DashboardPanel.axaml" /> -->
-    <!-- <AvaloniaXaml Include="Views\Docker\DockerPanel.axaml" /> -->
-    <!-- <AvaloniaXaml Include="Views\Explorer\ExplorerPanel.axaml" /> -->
-    <!-- <AvaloniaXaml Include="Views\Engines\EnginesPanel.axaml" /> -->
-    <!-- <AvaloniaXaml Include="Views\GitHub\GitHubPanel.axaml" /> -->
-    <!-- <AvaloniaXaml Include="Views\KiSystem\KiSystemPanel.axaml" /> -->
-    <!-- <AvaloniaXaml Include="Views\Network\NetworkPanel.axaml" /> -->
-    <!-- <AvaloniaXaml Include="Views\Settings\SettingsPanel.axaml" /> -->
-    <!-- <AvaloniaXaml Include="Views\Chat\SidePanel.axaml" /> -->
+  <ItemGroup Condition="'$(FeatureLeftRail)'=='true'">
+    <AvaloniaXaml Include="Views\LeftRail.axaml" />
+  </ItemGroup>
+
+  <!-- Panels -->
+  <ItemGroup Condition="'$(FeatureDashboard)'=='true'">
+    <AvaloniaXaml Include="Views\Dashboard\DashboardPanel.axaml" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(FeatureDocker)'=='true'">
+    <AvaloniaXaml Include="Views\Docker\DockerPanel.axaml" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(FeatureExplorer)'=='true'">
+    <AvaloniaXaml Include="Views\Explorer\ExplorerPanel.axaml" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(FeatureEngines)'=='true'">
+    <AvaloniaXaml Include="Views\Engines\EnginesPanel.axaml" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(FeatureGitHub)'=='true'">
+    <AvaloniaXaml Include="Views\GitHub\GitHubPanel.axaml" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(FeatureKiSystem)'=='true'">
+    <AvaloniaXaml Include="Views\KiSystem\KiSystemPanel.axaml" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(FeatureNetwork)'=='true'">
+    <AvaloniaXaml Include="Views\Network\NetworkPanel.axaml" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(FeatureSettings)'=='true'">
+    <AvaloniaXaml Include="Views\Settings\SettingsPanel.axaml" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(FeatureChat)'=='true'">
+    <AvaloniaXaml Include="Views\Chat\SidePanel.axaml" />
   </ItemGroup>
 
   <!-- Assets -->
@@ -76,20 +161,87 @@
   </ItemGroup>
 
   <!-- ============================================================
-       CODE ISOLATION (WICHTIG: KEINE Compile Include, sonst NETSDK1022)
+       COMPILE FILTERS
+       - remove view/state code when feature is off (prevents InitializeComponent errors)
        ============================================================ -->
 
-  <!-- Isolation ON: echte Services raus -->
-  <ItemGroup Condition="'$(IsIsolationMode)' == 'true'">
-    <Compile Remove="Services\Chat\ChatService.cs" />
-    <Compile Remove="Services\Docker\DockerService.cs" />
-    <Compile Remove="Services\Network\NetworkHost.cs" />
+  <!-- Shell code-behind -->
+  <ItemGroup Condition="'$(FeatureLayout)'!='true'">
+    <Compile Remove="Views\Layout.cs" />
   </ItemGroup>
 
-  <!-- Isolation OFF: Stub-Dateien raus -->
-  <ItemGroup Condition="'$(IsIsolationMode)' != 'true'">
-    <Compile Remove="Services\Chat\ChatService.Isolation.cs" />
-    <Compile Remove="Services\Docker\DockerService.Isolation.cs" />
+  <ItemGroup Condition="'$(FeatureLeftRail)'!='true'">
+    <Compile Remove="Views\LeftRail.cs" />
+  </ItemGroup>
+
+  <!-- Panels: remove *entire folder* when feature off -->
+  <ItemGroup Condition="'$(FeatureDashboard)'!='true'">
+    <Compile Remove="Views\Dashboard\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(FeatureDocker)'!='true'">
+    <Compile Remove="Views\Docker\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(FeatureExplorer)'!='true'">
+    <Compile Remove="Views\Explorer\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(FeatureEngines)'!='true'">
+    <Compile Remove="Views\Engines\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(FeatureGitHub)'!='true'">
+    <Compile Remove="Views\GitHub\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(FeatureKiSystem)'!='true'">
+    <Compile Remove="Views\KiSystem\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(FeatureNetwork)'!='true'">
+    <Compile Remove="Views\Network\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(FeatureSettings)'!='true'">
+    <Compile Remove="Views\Settings\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(FeatureChat)'!='true'">
+    <Compile Remove="Views\Chat\**\*.cs" />
+  </ItemGroup>
+
+  <!--
+    WICHTIG:
+    Services NICHT mehr anhand von UI-Features rauswerfen.
+    Du wolltest "Panels ausblenden", nicht "Core-Typen wegsprengen".
+    Damit sind Publish/DI stabil, ohne Isolation-Datei-Hölle.
+  -->
+    <!-- ============================================================
+       SERVICES: quick isolation to keep "panels off" builds green
+       - Chat/Docker/Auth services depend on Views/Models that are removed when panels are off
+       - Network stays compiled because AppState depends on NetworkSession
+       ============================================================ -->
+
+  <ItemGroup Condition="'$(FeatureChat)'!='true'">
+    <Compile Remove="Services\Chat\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(FeatureDocker)'!='true'">
+    <Compile Remove="Services\Docker\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(FeatureAuth)'!='true'">
+    <Compile Remove="Services\Auth\**\*.cs" />
+  </ItemGroup>
+  <!-- Network: wenn FeatureNetwork AUS, nur NetworkSession behalten (Core),
+       alle anderen Network-Implementierungen entfernen (vermeidet Docker-Abhängigkeit über NetworkHost) -->
+  <ItemGroup Condition="'$(FeatureNetwork)'!='true'">
+    <Compile Remove="Services\Network\GithubDeviceFlow.cs" />
+    <Compile Remove="Services\Network\NetworkApiService.cs" />
+    <Compile Remove="Services\Network\NetworkDtos.cs" />
+    <Compile Remove="Services\Network\NetworkHost.cs" />
+    <Compile Remove="Services\Network\WireGuardKeys.cs" />
   </ItemGroup>
 
 </Project>

@@ -1,19 +1,30 @@
 using System;
-using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
 
 using GatewayIDE.App.Commands;
 using GatewayIDE.App.Services.App;
-using GatewayIDE.App.Services.Auth;
-using GatewayIDE.App.Services.Chat;
-using GatewayIDE.App.Services.Network;
-
+using GatewayIDE.App.Services.Network; // IMMER: AppState braucht NetworkSession
 using GatewayIDE.App.Views;
 
-#if !ISOLATION_MODE
+#if FEATURE_NETWORK
+using System.Net.Http;
+#endif
+
+#if FEATURE_AUTH
+using GatewayIDE.App.Services.Auth;
+#endif
+
+#if FEATURE_CHAT
+using GatewayIDE.App.Services.Chat;
 using GatewayIDE.App.Views.Chat;
-using GatewayIDE.App.Views.Docker;
+#endif
+
+#if FEATURE_KISYSTEM
 using GatewayIDE.App.Views.KiSystem;
+#endif
+
+#if FEATURE_DOCKER
+using GatewayIDE.App.Views.Docker;
 #endif
 
 namespace GatewayIDE.App;
@@ -25,7 +36,7 @@ public static class AppBootstrap
         var sc = new ServiceCollection();
 
         // =========================
-        // Core UI state (immer)
+        // Core UI (immer)
         // =========================
         sc.AddSingleton<LayoutState>();
 
@@ -33,16 +44,21 @@ public static class AppBootstrap
         // App / Settings / Registry (immer)
         // =========================
         sc.AddSingleton<SettingsService>();
-        sc.AddSingleton<GatewayIDEConfig>();   // optional: später aus SettingsService.Load() befüllen
+        sc.AddSingleton<GatewayIDEConfig>();
         sc.AddSingleton<RegistryService>();
         sc.AddSingleton<AppState>();
 
         // =========================
-        // Network (immer)
+        // Core: NetworkSession (immer)
+        // - AppState nutzt ApplyAuth/Clear
+        // - Panel/UI bleibt trotzdem über FEATURE_NETWORK aus
         // =========================
         sc.AddSingleton<NetworkSession>();
 
-        // HttpClient für NetworkApiService (BaseAddress aus Config)
+#if FEATURE_NETWORK
+        // =========================
+        // Optional: Network API
+        // =========================
         sc.AddSingleton(sp =>
         {
             var cfg = sp.GetRequiredService<GatewayIDEConfig>();
@@ -50,33 +66,65 @@ public static class AppBootstrap
         });
 
         sc.AddSingleton<NetworkApiService>();
+#endif
 
-        // Feature services (immer – dürfen bleiben, auch ohne UI)
+#if FEATURE_AUTH
         sc.AddSingleton<AuthBootstrapService>();
+#endif
+
+#if FEATURE_CHAT
         sc.AddSingleton<ChatService>();
+#endif
 
 #if !ISOLATION_MODE
         // =========================
-        // Feature UI state (nur wenn nicht isoliert)
+        // Feature UI state
         // =========================
+
+#if FEATURE_KISYSTEM
         sc.AddSingleton<ThreadRouter>();
+#endif
+
+#if FEATURE_CHAT
         sc.AddSingleton<ChatState>();
+#endif
 
         // =========================
-        // Panel states (nur wenn nicht isoliert)
+        // Panel states
         // =========================
+#if FEATURE_DASHBOARD
         sc.AddSingleton<GatewayIDE.App.Views.Dashboard.DashboardPanelState>();
+#endif
 
-        // WICHTIG: bei dir heißt der Docker-Facade-Typ "DockerUi"
+#if FEATURE_DOCKER
         sc.AddSingleton<DockerPanelState>();
+#endif
 
+#if FEATURE_EXPLORER
         sc.AddSingleton<GatewayIDE.App.Views.Explorer.ExplorerPanelState>();
+#endif
+
+#if FEATURE_ENGINES
         sc.AddSingleton<GatewayIDE.App.Views.Engines.EnginesPanelState>();
+#endif
+
+#if FEATURE_GITHUB
         sc.AddSingleton<GatewayIDE.App.Views.GitHub.GitHubPanelState>();
+#endif
+
+#if FEATURE_KISYSTEM
         sc.AddSingleton<GatewayIDE.App.Views.KiSystem.KiSystemPanelState>();
+#endif
+
+#if FEATURE_NETWORK
         sc.AddSingleton<GatewayIDE.App.Views.Network.NetworkPanelState>();
+#endif
+
+#if FEATURE_SETTINGS
         sc.AddSingleton<GatewayIDE.App.Views.Settings.SettingsPanelState>();
 #endif
+
+#endif // !ISOLATION_MODE
 
         // =========================
         // Commands + UI Root (immer)

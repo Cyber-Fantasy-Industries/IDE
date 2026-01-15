@@ -14,8 +14,10 @@ GatewayIDE/
 │   │   │   └── AuthBootstrapService C#
 │   │   ├── Chat/
 │   │   │   └── ChatService C#
+│   │   │   └── ChatService.Isolation C#
 │   │   ├── Docker/
 │   │   │   └── DockerService C#
+│   │   │   └── DockerService.Isolation C#
 │   │   └── Network/
 │   │       ├── GithubDeviceFlow C#
 │   │       ├── NetworkApiService C#
@@ -40,6 +42,7 @@ GatewayIDE/
 │   │   │   ├── DockerPanelState C#
 │   │   │   ├── DockerPanelCommands C#
 │   │   │   ├── DockerPanel.axaml
+│   │   │   ├── ContainerStatus C#
 │   │   │   ├── ServiceUnitVm C#
 │   │   │   ├── UnitConfig C#
 │   │   │   ├── UnitRuntime C#
@@ -75,6 +78,7 @@ GatewayIDE/
 │   │   │   ├── SettingsPanel C#
 │   │   │   ├── SettingsPanelState C#
 │   │   │   └── SettingsPanelCommands C#
+│   │   ├── _StubsWhenDisabled C#
 │   │   ├── LeftRail.axaml
 │   │   ├── LeftRail C#
 │   │   ├── LayoutState C#
