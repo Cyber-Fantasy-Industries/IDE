@@ -318,20 +318,19 @@ rem --------------------------------------------
 set "INSTALLPS1=%SAFE_TEMP%\dotnet-install.ps1"
 
 echo [DL] Lade dotnet-install.ps1 nach: "%INSTALLPS1%"
-
-powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-  "try { ^
-      $u='https://dot.net/v1/dotnet-install.ps1'; ^
-      Invoke-WebRequest -Uri $u -OutFile '%INSTALLPS1%' -UseBasicParsing; ^
-      exit 0 ^
-   } catch { ^
-      Write-Host $_; exit 1 ^
-   }"
+where curl >nul 2>&1
+if not errorlevel 1 (
+  curl -L --fail -o "%INSTALLPS1%" "https://dot.net/v1/dotnet-install.ps1"
+) else (
+  powershell -NoProfile -ExecutionPolicy Bypass -Command "try { $u='https://dot.net/v1/dotnet-install.ps1'; Invoke-WebRequest -Uri $u -OutFile '%INSTALLPS1%' -UseBasicParsing; exit 0 } catch { Write-Host $_; exit 1 }"
+)
 if errorlevel 1 (
   echo [ABORT] Download dotnet-install.ps1 fehlgeschlagen
   echo [HINT] Bitte manuell installieren: https://aka.ms/dotnet/download
   exit /b 1
 )
+
+
 
 rem --------------------------------------------
 rem Installiere SDK Channel 8.0 fuer aktuelle Architektur
