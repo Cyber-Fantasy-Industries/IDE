@@ -21,7 +21,7 @@ public sealed class DockerPanelState
     public DockerUnitsCatalog Units { get; }
     public DockerState State { get; }
     public DockerController Controller { get; }
-
+    public DockerPanelCommands Commands { get; }
 
     // Parameterlos -> XAML friendly
     public DockerPanelState()
@@ -29,6 +29,7 @@ public sealed class DockerPanelState
         Units = new DockerUnitsCatalog();
         State = new DockerState();
         Controller = new DockerController(State, Units);
+        Commands = new DockerPanelCommands(this);
 
 
         // 👉 EIN Ort für Unit-Definitionen
