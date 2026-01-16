@@ -2,10 +2,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="GatewayIDE.App.Views.KiSystem.KiSystemPanel">
 
-<Grid IsVisible="{Binding Layout.IsKiSystem}"
-                    ColumnDefinitions="3*,*"
-                    RowDefinitions="3*,*"
-                    Margin="8">
+  <Grid
+      ColumnDefinitions="3*,*"
+      RowDefinitions="3*,*"
+      Margin="8">
+
                 <!-- 2x2 Thread-Board links -->
                 <Grid Grid.Column="0" Grid.Row="0"
                       RowDefinitions="*,*"

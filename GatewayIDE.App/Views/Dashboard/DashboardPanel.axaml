@@ -3,6 +3,7 @@
              xmlns:conv="clr-namespace:GatewayIDE.App"
              x:Class="GatewayIDE.App.Views.Dashboard.DashboardPanel">
 
+  <!-- ================= STYLES ================= -->
   <UserControl.Styles>
 
     <!-- Card -->
@@ -11,7 +12,7 @@
       <Setter Property="BorderBrush" Value="#2a2a2a"/>
       <Setter Property="BorderThickness" Value="1"/>
       <Setter Property="CornerRadius" Value="12"/>
-      <Setter Property="Padding" Value="14"/>
+      <Setter Property="Padding" Value="16"/>
     </Style>
 
     <!-- Titles -->
@@ -32,7 +33,7 @@
       <Setter Property="FontSize" Value="12"/>
     </Style>
 
-    <!-- Status Badge -->
+    <!-- Badge -->
     <Style Selector="Border.badge">
       <Setter Property="CornerRadius" Value="999"/>
       <Setter Property="BorderThickness" Value="1"/>
@@ -61,120 +62,120 @@
 
   </UserControl.Styles>
 
+  <!-- ================= LAYOUT ================= -->
   <Grid Background="#0f0f0f">
-    <ScrollViewer Margin="12" HorizontalScrollBarVisibility="Disabled">
-      <StackPanel Spacing="12">
+    <ScrollViewer Margin="12"
+                  HorizontalScrollBarVisibility="Disabled"
+                  VerticalScrollBarVisibility="Auto">
 
-        <!-- Header -->
+      <!-- ROOT STACK -->
+      <StackPanel Spacing="16">
+
+        <!-- ===== HEADER ===== -->
         <Border Classes="card">
-          <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,6,Auto">
+          <StackPanel Spacing="6">
             <TextBlock Classes="h1" Text="Dashboard"/>
-            <TextBlock Grid.Row="2"
-                       Classes="muted"
-                       Text="Systemstatus + laufende Container" />
-          </Grid>
+            <TextBlock Classes="muted"
+                       Text="Systemstatus und laufende Container"/>
+          </StackPanel>
         </Border>
 
-        <!-- Status Cards -->
+        <!-- ===== STATUS CARDS ===== -->
         <Grid ColumnDefinitions="*,12,*">
 
           <!-- Docker Installed -->
           <Border Classes="card" Grid.Column="0">
-            <Grid RowDefinitions="Auto,10,Auto,10,Auto">
+            <StackPanel Spacing="10">
               <TextBlock Classes="h2" Text="Docker installiert"/>
-              <Border Grid.Row="2" Classes="badge"
+
+              <Border Classes="badge"
                       BorderBrush="{Binding DockerInstalled, Converter={x:Static conv:BooleanToBrushConverter.Instance}, ConverterParameter=Border}"
                       Background="{Binding DockerInstalled, Converter={x:Static conv:BooleanToBrushConverter.Instance}, ConverterParameter=Background}">
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                  <TextBlock Classes="badgeText"
-                             Foreground="{Binding DockerInstalled, Converter={x:Static conv:BooleanToBrushConverter.Instance}, ConverterParameter=Foreground}"
-                             Text="{Binding DockerInstalled, Converter={x:Static conv:BooleanToTextConverter.Instance}}"/>
-                </StackPanel>
+                <TextBlock Classes="badgeText"
+                           Foreground="{Binding DockerInstalled, Converter={x:Static conv:BooleanToBrushConverter.Instance}, ConverterParameter=Foreground}"
+                           Text="{Binding DockerInstalled, Converter={x:Static conv:BooleanToTextConverter.Instance}}"/>
               </Border>
 
-              <TextBlock Grid.Row="4" Classes="muted"
-                         Text="True/False: kommt aus DashboardState.DockerInstalled"/>
-            </Grid>
+              <TextBlock Classes="muted"
+                         Text="DashboardState.DockerInstalled"/>
+            </StackPanel>
           </Border>
-
-          <!-- Spacer ist die mittlere Spalte (12px) -->
 
           <!-- Docker Running -->
           <Border Classes="card" Grid.Column="2">
-            <Grid RowDefinitions="Auto,10,Auto,10,Auto">
+            <StackPanel Spacing="10">
               <TextBlock Classes="h2" Text="Docker läuft"/>
-              <Border Grid.Row="2" Classes="badge"
+
+              <Border Classes="badge"
                       BorderBrush="{Binding DockerRunning, Converter={x:Static conv:BooleanToBrushConverter.Instance}, ConverterParameter=Border}"
                       Background="{Binding DockerRunning, Converter={x:Static conv:BooleanToBrushConverter.Instance}, ConverterParameter=Background}">
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                  <TextBlock Classes="badgeText"
-                             Foreground="{Binding DockerRunning, Converter={x:Static conv:BooleanToBrushConverter.Instance}, ConverterParameter=Foreground}"
-                             Text="{Binding DockerRunning, Converter={x:Static conv:BooleanToTextConverter.Instance}}"/>
-                </StackPanel>
+                <TextBlock Classes="badgeText"
+                           Foreground="{Binding DockerRunning, Converter={x:Static conv:BooleanToBrushConverter.Instance}, ConverterParameter=Foreground}"
+                           Text="{Binding DockerRunning, Converter={x:Static conv:BooleanToTextConverter.Instance}}"/>
               </Border>
 
-              <TextBlock Grid.Row="4" Classes="muted"
-                         Text="True/False: kommt aus DashboardState.DockerRunning"/>
-            </Grid>
+              <TextBlock Classes="muted"
+                         Text="DashboardState.DockerRunning"/>
+            </StackPanel>
           </Border>
 
         </Grid>
 
-        <!-- Running Containers -->
+        <!-- ===== RUNNING CONTAINERS ===== -->
         <Border Classes="card">
-          <Grid RowDefinitions="Auto,8,Auto,10,*">
+          <Grid RowDefinitions="Auto,8,*,8,Auto">
+
+            <!-- Header -->
             <Grid ColumnDefinitions="*,Auto">
               <TextBlock Classes="h2" Text="Laufende Container"/>
-              <TextBlock Grid.Column="1" Classes="muted"
+              <TextBlock Grid.Column="1"
+                         Classes="muted"
                          Text="{Binding RunningContainers.Count, StringFormat='Anzahl: {0}'}"/>
             </Grid>
 
-            <TextBlock Grid.Row="2" Classes="muted"
-                       Text="Binding: DashboardState.RunningContainers" />
-
-            <Border Grid.Row="4" BorderBrush="#222" BorderThickness="1" CornerRadius="10" Padding="10" Background="#101010">
+            <!-- List -->
+            <ScrollViewer Grid.Row="2"
+                          VerticalScrollBarVisibility="Auto">
               <ItemsControl ItemsSource="{Binding RunningContainers}">
                 <ItemsControl.ItemTemplate>
                   <DataTemplate>
                     <Border Classes="row" Margin="0,0,0,8">
-                      <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,6,Auto,6,Auto">
+                      <StackPanel Spacing="6">
 
-                        <!-- Name + Status -->
-                        <Grid ColumnDefinitions="Auto,10,*" Grid.ColumnSpan="2">
-                          <TextBlock Classes="mono" Text="{Binding Name}" />
-                          <TextBlock Grid.Column="2"
+                        <Grid ColumnDefinitions="*,Auto">
+                          <TextBlock Classes="mono" Text="{Binding Name}"/>
+                          <TextBlock Grid.Column="1"
                                      Classes="mono"
                                      Foreground="#a9a9a9"
-                                     Text="{Binding Status}" />
+                                     Text="{Binding Status}"/>
                         </Grid>
 
-                        <!-- Image -->
-                        <TextBlock Grid.Row="2" Grid.ColumnSpan="2"
-                                   Classes="muted"
+                        <TextBlock Classes="muted"
                                    Text="{Binding Image, StringFormat='Image: {0}'}"/>
 
-                        <!-- Ports -->
-                        <TextBlock Grid.Row="4" Grid.ColumnSpan="2"
-                                   Classes="muted"
+                        <TextBlock Classes="muted"
                                    Text="{Binding Ports, StringFormat='Ports: {0}'}"/>
 
-                      </Grid>
+                      </StackPanel>
                     </Border>
                   </DataTemplate>
                 </ItemsControl.ItemTemplate>
               </ItemsControl>
-            </Border>
-          </Grid>
-        </Border>
+            </ScrollViewer>
 
-        <!-- Empty hint (if no containers) -->
-        <Border Classes="card"
-                IsVisible="{Binding RunningContainers.Count, Converter={x:Static conv:ZeroToBoolConverter.Instance}, ConverterParameter=invert}">
-          <StackPanel Spacing="6">
-            <TextBlock Classes="h2" Text="Keine laufenden Container"/>
-            <TextBlock Classes="muted"
-                       Text="Sobald Docker läuft und Container aktiv sind, erscheint hier die Liste."/>
-          </StackPanel>
+            <!-- Empty hint -->
+            <Border Grid.Row="4"
+                    IsVisible="{Binding RunningContainers.Count,
+                                Converter={x:Static conv:ZeroToBoolConverter.Instance},
+                                ConverterParameter=invert}">
+              <StackPanel Spacing="6">
+                <TextBlock Classes="h2" Text="Keine laufenden Container"/>
+                <TextBlock Classes="muted"
+                           Text="Sobald Docker läuft und Container aktiv sind, erscheint hier die Liste."/>
+              </StackPanel>
+            </Border>
+
+          </Grid>
         </Border>
 
       </StackPanel>

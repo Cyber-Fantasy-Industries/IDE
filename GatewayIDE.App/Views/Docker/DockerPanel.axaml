@@ -2,12 +2,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="GatewayIDE.App.Views.Docker.DockerPanel">
 
-  <Grid Margin="8"
-        ClipToBounds="True">
-
+  <Grid Margin="8" ClipToBounds="True">
     <!-- Main area: Units (left) + Logs (right) -->
-    <Grid ColumnDefinitions="340,8,*"
-          ClipToBounds="True">
+    <Grid ColumnDefinitions="340,8,*" ClipToBounds="True">
 
       <!-- ================= LEFT: UNITS ================= -->
       <Border Grid.Column="0"
@@ -22,7 +19,7 @@
                      Margin="0,0,0,8"/>
 
           <ListBox Grid.Row="1"
-                   ItemsSource="{Binding Docker.Units.Units}"
+                   ItemsSource="{Binding Units.Units}"
                    SelectedItem="{Binding Units.SelectedUnit, Mode=TwoWay}">
 
             <ListBox.ItemTemplate>
@@ -34,7 +31,6 @@
                         Background="#1b1b1b">
 
                   <!-- ================= UNIT CARD ================= -->
-                  <!-- spacing via explicit spacer row -->
                   <Grid RowDefinitions="Auto,10,Auto">
 
                     <!-- ===== HEADER ===== -->
@@ -72,7 +68,6 @@
                     <!-- spacer row: Grid.Row=1 is 10px -->
 
                     <!-- ===== ACTIONS (3 x 2) ===== -->
-                    <!-- spacing via explicit spacer columns/rows -->
                     <Grid Grid.Row="2"
                           ColumnDefinitions="*,6,*,6,*"
                           RowDefinitions="Auto,6,Auto">
@@ -86,13 +81,13 @@
 
                       <Button Grid.Row="0" Grid.Column="2"
                               Content="Up"
-                              Command="{Binding DataContext.Commands.StartGatewayCommand,
+                              Command="{Binding DataContext.Commands.StartCommand,
                                                 RelativeSource={RelativeSource AncestorType=UserControl}}"
                               CommandParameter="{Binding}"/>
 
                       <Button Grid.Row="0" Grid.Column="4"
                               Content="Down"
-                              Command="{Binding DataContext.Commands.StopGatewayCommand,
+                              Command="{Binding DataContext.Commands.DownCommand,
                                                 RelativeSource={RelativeSource AncestorType=UserControl}}"
                               CommandParameter="{Binding}"/>
 
@@ -100,13 +95,13 @@
                       <Button Grid.Row="2" Grid.Column="0"
                               Content="⟳"
                               ToolTip.Tip="Restart"
-                              Command="{Binding DataContext.Commands.RestartGatewayCommand,
+                              Command="{Binding DataContext.Commands.RestartCommand,
                                                 RelativeSource={RelativeSource AncestorType=UserControl}}"
                               CommandParameter="{Binding}"/>
 
                       <Button Grid.Row="2" Grid.Column="2"
                               Content="Rebuild"
-                              Command="{Binding DataContext.Commands.RebuildGatewayCommand,
+                              Command="{Binding DataContext.Commands.RebuildCommand,
                                                 RelativeSource={RelativeSource AncestorType=UserControl}}"
                               CommandParameter="{Binding}"/>
 
@@ -218,13 +213,12 @@
                  Text="{Binding Controller.ContainerCommand, Mode=TwoWay}">
           <TextBox.KeyBindings>
             <KeyBinding Gesture="Enter"
-                        Command="{Binding Commands.ExecuteInContainerCommand}"
+                        Command="{Binding Commands.ExecCommand}"
                         CommandParameter="{Binding Text, ElementName=ContainerCmdBox}" />
           </TextBox.KeyBindings>
         </TextBox>
 
       </Grid>
-
     </Grid>
   </Grid>
 </UserControl>

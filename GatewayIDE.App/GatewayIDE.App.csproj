@@ -26,10 +26,10 @@
     <FeatureEngines>true</FeatureEngines>
     <FeatureGitHub>true</FeatureGitHub>
     <FeatureKiSystem>true</FeatureKiSystem>
-    <FeatureNetwork>false</FeatureNetwork>
-    <FeatureSettings>false</FeatureSettings>
+    <FeatureNetwork>true</FeatureNetwork>
+    <FeatureSettings>true</FeatureSettings>
     <FeatureChat>false</FeatureChat>
-    <FeatureDocker>false</FeatureDocker>
+    <FeatureDocker>true</FeatureDocker>
 
     <!-- Services -->
     <FeatureAuth>true</FeatureAuth>

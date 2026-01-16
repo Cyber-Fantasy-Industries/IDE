@@ -6,53 +6,71 @@
              xmlns:eng="clr-namespace:GatewayIDE.App.Views.Engines"
              xmlns:gh="clr-namespace:GatewayIDE.App.Views.GitHub"
              xmlns:ki="clr-namespace:GatewayIDE.App.Views.KiSystem"
-
+             xmlns:dock="clr-namespace:GatewayIDE.App.Views.Docker"
+             xmlns:net="clr-namespace:GatewayIDE.App.Views.Network"
+             xmlns:set="clr-namespace:GatewayIDE.App.Views.Settings"
              x:Class="GatewayIDE.App.Views.Layout">
 
-  <!-- Isolation Layout: nur LeftRail + Platzhalter -->
   <Grid Background="#0f0f0f"
         ColumnDefinitions="56,*"
         RowDefinitions="*,Auto">
 
-    <!-- LeftRail (muss in csproj aktiviert sein: Views\LeftRail.axaml) -->
+    <!-- LeftRail -->
     <views:LeftRail Grid.Column="0"/>
 
-    <!-- Workspace -->
-    <Grid Grid.Column="1" Margin="12" RowDefinitions="Auto,*">
-      <TabControl>
+    <!-- WORKSPACE (genau EIN Slot, volle Höhe) -->
+    <Grid Grid.Column="1" Margin="0">
 
-        <TabItem Header="Explorer">
-          <expl:ExplorerPanel />
-        </TabItem>
+      <!-- Explorer -->
+      <expl:ExplorerPanel
+        DataContext="{Binding Explorer}"
+        IsVisible="{Binding Layout.IsExplorer}"/>
 
-        <TabItem Header="Dashboard">
-          <dash:DashboardPanel />
-        </TabItem>
+      <!-- Dashboard -->
+      <dash:DashboardPanel
+        DataContext="{Binding Dashboard}"
+        IsVisible="{Binding Layout.IsDashboard}"/>
 
-        <TabItem Header="Engines">
-          <eng:EnginesPanel />
-        </TabItem>
+      <!-- Engines -->
+      <eng:EnginesPanel
+        DataContext="{Binding Engines}"
+        IsVisible="{Binding Layout.IsEngines}"/>
 
-        <TabItem Header="GitHub">
-          <gh:GitHubPanel />
-        </TabItem>
+      <!-- GitHub -->
+      <gh:GitHubPanel
+        DataContext="{Binding GitHub}"
+        IsVisible="{Binding Layout.IsGitHub}"/>
 
-        <TabItem Header="KI-System">
-          <ki:KiSystemPanel />
-        </TabItem>
+      <!-- KI-System -->
+      <ki:KiSystemPanel
+        DataContext="{Binding KiSystem}"
+        IsVisible="{Binding Layout.IsKiSystem}"/>
 
-      </TabControl>
+      <!-- Docker -->
+      <dock:DockerPanel
+        DataContext="{Binding Docker}"
+        IsVisible="{Binding Layout.IsDocker}"/>
+
+      <!-- Network -->
+      <net:NetworkPanel
+        DataContext="{Binding Network}"
+        IsVisible="{Binding Layout.IsNetwork}"/>
+
+      <!-- Settings -->
+      <set:SettingsPanel
+        DataContext="{Binding Settings}"
+        IsVisible="{Binding Layout.IsSettings}"/>
+
+
     </Grid>
 
-
-    <!-- Statusbar (optional, aber stabil) -->
+    <!-- Statusbar -->
     <Border Grid.Row="1"
             Grid.ColumnSpan="2"
             Background="#111"
             BorderBrush="#222"
             BorderThickness="1,1,0,0"
             Padding="8">
-
       <TextBlock Text="Status: isolation"
                  Foreground="#aaaaaa"/>
     </Border>

@@ -4,7 +4,8 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using GatewayIDE.App.Views.Docker;
+using UnitConfig = GatewayIDE.App.Views.Docker.UnitConfig;
+
 
 namespace GatewayIDE.App.Services.Docker
 {
