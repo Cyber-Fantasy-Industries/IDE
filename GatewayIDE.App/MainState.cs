@@ -52,7 +52,6 @@ public sealed class MainState
     public ThreadRouter Threads { get; }
 #endif
 
-    // Panel DataContexts (für Layout.axaml: DataContext="{Binding X}")
 #if !ISOLATION_MODE && FEATURE_DASHBOARD
     public DashboardPanelState Dashboard { get; }
 #endif
@@ -94,7 +93,6 @@ public sealed class MainState
 #if !ISOLATION_MODE && FEATURE_KISYSTEM
         , ThreadRouter threads
 #endif
-
 #if !ISOLATION_MODE && FEATURE_DASHBOARD
         , DashboardPanelState dashboard
 #endif
@@ -119,7 +117,7 @@ public sealed class MainState
 #if !ISOLATION_MODE && FEATURE_SETTINGS
         , SettingsPanelState settings
 #endif
-        )
+    )
     {
         Layout = layout;
         Commands = commands;
@@ -135,24 +133,31 @@ public sealed class MainState
 #if !ISOLATION_MODE && FEATURE_DASHBOARD
         Dashboard = dashboard;
 #endif
+
 #if !ISOLATION_MODE && FEATURE_EXPLORER
         Explorer = explorer;
 #endif
+
 #if !ISOLATION_MODE && FEATURE_ENGINES
         Engines = engines;
 #endif
+
 #if !ISOLATION_MODE && FEATURE_GITHUB
         GitHub = gitHub;
 #endif
+
 #if !ISOLATION_MODE && FEATURE_KISYSTEM
         KiSystem = kiSystem;
 #endif
+
 #if !ISOLATION_MODE && FEATURE_DOCKER
         Docker = docker;
 #endif
+
 #if !ISOLATION_MODE && FEATURE_NETWORK
         Network = network;
 #endif
+
 #if !ISOLATION_MODE && FEATURE_SETTINGS
         Settings = settings;
 #endif

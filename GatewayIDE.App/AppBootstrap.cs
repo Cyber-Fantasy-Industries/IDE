@@ -77,51 +77,50 @@ public static class AppBootstrap
 #endif
 
 #if !ISOLATION_MODE
-        // =========================
-        // Feature UI state
-        // =========================
-
-#if FEATURE_KISYSTEM
-        sc.AddSingleton<ThreadRouter>();
+// =========================
+// Feature UI state
+// =========================
+#if !ISOLATION_MODE && FEATURE_KISYSTEM
+sc.AddSingleton<ThreadRouter>();
 #endif
 
-#if FEATURE_CHAT
-        sc.AddSingleton<ChatState>();
+#if !ISOLATION_MODE && FEATURE_CHAT
+sc.AddSingleton<ChatState>();
 #endif
 
-        // =========================
-        // Panel states
-        // =========================
+// =========================
+// Panel states (NICHT an ISOLATION_MODE koppeln)
+// =========================
 #if FEATURE_DASHBOARD
-        sc.AddSingleton<GatewayIDE.App.Views.Dashboard.DashboardPanelState>();
+sc.AddSingleton<GatewayIDE.App.Views.Dashboard.DashboardPanelState>();
 #endif
 
 #if FEATURE_DOCKER
-        sc.AddSingleton<DockerPanelState>();
+sc.AddSingleton<DockerPanelState>();
 #endif
 
 #if FEATURE_EXPLORER
-        sc.AddSingleton<GatewayIDE.App.Views.Explorer.ExplorerPanelState>();
+sc.AddSingleton<GatewayIDE.App.Views.Explorer.ExplorerPanelState>();
 #endif
 
 #if FEATURE_ENGINES
-        sc.AddSingleton<GatewayIDE.App.Views.Engines.EnginesPanelState>();
+sc.AddSingleton<GatewayIDE.App.Views.Engines.EnginesPanelState>();
 #endif
 
 #if FEATURE_GITHUB
-        sc.AddSingleton<GatewayIDE.App.Views.GitHub.GitHubPanelState>();
+sc.AddSingleton<GatewayIDE.App.Views.GitHub.GitHubPanelState>();
 #endif
 
 #if FEATURE_KISYSTEM
-        sc.AddSingleton<GatewayIDE.App.Views.KiSystem.KiSystemPanelState>();
+sc.AddSingleton<GatewayIDE.App.Views.KiSystem.KiSystemPanelState>();
 #endif
 
 #if FEATURE_NETWORK
-        sc.AddSingleton<GatewayIDE.App.Views.Network.NetworkPanelState>();
+sc.AddSingleton<GatewayIDE.App.Views.Network.NetworkPanelState>();
 #endif
 
 #if FEATURE_SETTINGS
-        sc.AddSingleton<GatewayIDE.App.Views.Settings.SettingsPanelState>();
+sc.AddSingleton<GatewayIDE.App.Views.Settings.SettingsPanelState>();
 #endif
 
 #endif // !ISOLATION_MODE

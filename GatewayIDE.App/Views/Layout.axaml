@@ -18,49 +18,48 @@
     <!-- LeftRail -->
     <views:LeftRail Grid.Column="0"/>
 
-    <!-- WORKSPACE (genau EIN Slot, volle Höhe) -->
+    <!-- WORKSPACE -->
     <Grid Grid.Column="1" Margin="0">
 
       <!-- Explorer -->
-      <expl:ExplorerPanel
-        DataContext="{Binding Explorer}"
-        IsVisible="{Binding Layout.IsExplorer}"/>
+      <Border IsVisible="{Binding Layout.IsExplorer}">
+        <expl:ExplorerPanel DataContext="{Binding Explorer}"/>
+      </Border>
 
       <!-- Dashboard -->
-      <dash:DashboardPanel
-        DataContext="{Binding Dashboard}"
-        IsVisible="{Binding Layout.IsDashboard}"/>
+      <Border IsVisible="{Binding Layout.IsDashboard}">
+        <dash:DashboardPanel DataContext="{Binding Dashboard}"/>
+      </Border>
 
       <!-- Engines -->
-      <eng:EnginesPanel
-        DataContext="{Binding Engines}"
-        IsVisible="{Binding Layout.IsEngines}"/>
+      <Border IsVisible="{Binding Layout.IsEngines}">
+        <eng:EnginesPanel DataContext="{Binding Engines}"/>
+      </Border>
 
       <!-- GitHub -->
-      <gh:GitHubPanel
-        DataContext="{Binding GitHub}"
-        IsVisible="{Binding Layout.IsGitHub}"/>
+      <Border IsVisible="{Binding Layout.IsGitHub}">
+        <gh:GitHubPanel DataContext="{Binding GitHub}"/>
+      </Border>
 
       <!-- KI-System -->
-      <ki:KiSystemPanel
-        DataContext="{Binding KiSystem}"
-        IsVisible="{Binding Layout.IsKiSystem}"/>
+      <Border IsVisible="{Binding Layout.IsKiSystem}">
+        <ki:KiSystemPanel DataContext="{Binding KiSystem}"/>
+      </Border>
 
       <!-- Docker -->
-      <dock:DockerPanel
-        DataContext="{Binding Docker}"
-        IsVisible="{Binding Layout.IsDocker}"/>
+      <Border IsVisible="{Binding Layout.IsDocker}">
+        <dock:DockerPanel DataContext="{Binding Docker}"/>
+      </Border>
 
       <!-- Network -->
-      <net:NetworkPanel
-        DataContext="{Binding Network}"
-        IsVisible="{Binding Layout.IsNetwork}"/>
+      <Border IsVisible="{Binding Layout.IsNetwork}">
+        <net:NetworkPanel DataContext="{Binding Network}"/>
+      </Border>
 
       <!-- Settings -->
-      <set:SettingsPanel
-        DataContext="{Binding Settings}"
-        IsVisible="{Binding Layout.IsSettings}"/>
-
+      <Border IsVisible="{Binding Layout.IsSettings}">
+        <set:SettingsPanel DataContext="{Binding Settings}"/>
+      </Border>
 
     </Grid>
 

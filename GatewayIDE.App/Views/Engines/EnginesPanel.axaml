@@ -131,8 +131,8 @@
                   <Border Classes="row" Margin="0,0,0,8">
                     <StackPanel Spacing="2">
                       <TextBlock Classes="mono" Text="{Binding Name}"/>
-                      <TextBlock Classes="muted" Text="{Binding Version, StringFormat=Version: \{0\}}"/>
-                      <TextBlock Classes="muted" Text="{Binding Status, StringFormat=Status: \{0\}}"/>
+                      <TextBlock Classes="muted" Text="{Binding Version, StringFormat='Version: {0}'}"/>
+                      <TextBlock Classes="muted" Text="{Binding Status,  StringFormat='Status: {0}'}"/>
                     </StackPanel>
                   </Border>
                 </DataTemplate>
