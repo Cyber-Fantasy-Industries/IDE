@@ -4,10 +4,10 @@
 
   <UserControl.Styles>
 
-    <!-- Base text -->
+    <!-- Typography -->
     <Style Selector="TextBlock.h1">
       <Setter Property="Foreground" Value="#eaeaea"/>
-      <Setter Property="FontSize" Value="14"/>
+      <Setter Property="FontSize" Value="16"/>
       <Setter Property="FontWeight" Value="SemiBold"/>
     </Style>
 
@@ -22,44 +22,39 @@
       <Setter Property="FontSize" Value="12"/>
     </Style>
 
-    <Style Selector="TextBlock.mono">
-      <Setter Property="FontFamily" Value="Consolas, Cascadia Mono, Menlo, monospace"/>
-      <Setter Property="FontSize" Value="12"/>
-      <Setter Property="Foreground" Value="#d8d8d8"/>
-    </Style>
-
-    <!-- Flat root pane -->
-    <Style Selector="Border.pane">
-      <Setter Property="Background" Value="#0f0f0f"/>
+    <!-- Flat button -->
+    <Style Selector="Button.flat">
+      <Setter Property="Background" Value="#141414"/>
+      <Setter Property="Foreground" Value="#eaeaea"/>
       <Setter Property="BorderBrush" Value="#2a2a2a"/>
       <Setter Property="BorderThickness" Value="1"/>
       <Setter Property="CornerRadius" Value="0"/>
-      <Setter Property="Padding" Value="0"/>
+      <Setter Property="Padding" Value="12,7"/>
+    </Style>
+    <Style Selector="Button.flat:pointerover">
+      <Setter Property="Background" Value="#1b1b1b"/>
     </Style>
 
-    <!-- Header strip (one line bar) -->
-    <Style Selector="Border.strip">
+    <!-- Divider -->
+    <Style Selector="Border.div">
+      <Setter Property="Background" Value="#2a2a2a"/>
+    </Style>
+
+    <!-- Header strip -->
+    <Style Selector="Border.header">
       <Setter Property="Background" Value="#0f0f0f"/>
       <Setter Property="BorderBrush" Value="#2a2a2a"/>
       <Setter Property="BorderThickness" Value="0,0,0,1"/>
       <Setter Property="Padding" Value="12,10"/>
     </Style>
 
-    <!-- Buttons -->
-    <Style Selector="Button.action">
-      <Setter Property="Background" Value="#1b1b1b"/>
-      <Setter Property="Foreground" Value="#eaeaea"/>
-      <Setter Property="BorderBrush" Value="#2a2a2a"/>
-      <Setter Property="BorderThickness" Value="1"/>
-      <Setter Property="CornerRadius" Value="0"/>
-      <Setter Property="Padding" Value="12,8"/>
+    <!-- Pane (content area) -->
+    <Style Selector="Border.pane">
+      <Setter Property="Background" Value="#0f0f0f"/>
+      <Setter Property="Padding" Value="12,10"/>
     </Style>
 
-    <Style Selector="Button.action:pointerover">
-      <Setter Property="Background" Value="#242424"/>
-    </Style>
-
-    <!-- Tabs (Changes/History) -->
+    <!-- Small tab buttons (Changes/History) -->
     <Style Selector="Button.tab">
       <Setter Property="Background" Value="#0f0f0f"/>
       <Setter Property="Foreground" Value="#cfcfcf"/>
@@ -67,195 +62,113 @@
       <Setter Property="BorderThickness" Value="1"/>
       <Setter Property="CornerRadius" Value="0"/>
       <Setter Property="Padding" Value="12,8"/>
-      <Setter Property="Margin" Value="0,0,1,0"/>
     </Style>
-
-    <Style Selector="Button.tab:selected">
+    <Style Selector="Button.tab:pointerover">
       <Setter Property="Background" Value="#141414"/>
-      <Setter Property="Foreground" Value="#ffffff"/>
-    </Style>
-
-    <!-- List row (flat) -->
-    <Style Selector="Border.row">
-      <Setter Property="Background" Value="#0f0f0f"/>
-      <Setter Property="BorderBrush" Value="#2a2a2a"/>
-      <Setter Property="BorderThickness" Value="0,0,0,1"/>
-      <Setter Property="Padding" Value="12,10"/>
     </Style>
 
   </UserControl.Styles>
 
-  <!-- ROOT: edge-to-edge (kein Margin) -->
-  <Border Classes="pane">
-    <Grid RowDefinitions="Auto,*,Auto">
+  <!-- ROOT: edge-to-edge -->
+  <Grid Background="#0f0f0f"
+        RowDefinitions="Auto,*,Auto">
 
-      <!-- TOP BAR -->
-      <Border Grid.Row="0" Classes="strip">
-        <Grid ColumnDefinitions="280,1,*,1,Auto" VerticalAlignment="Center">
+    <!-- ========================= -->
+    <!-- HEADER (Row 0)            -->
+    <!-- ========================= -->
+    <Border Grid.Row="0" Classes="header">
+      <Grid ColumnDefinitions="Auto,12,Auto,12,Auto,12,*,12,Auto">
 
-          <!-- Repo -->
-          <StackPanel Spacing="2">
-            <TextBlock Classes="muted" Text="Current repository"/>
-            <TextBlock Classes="h1" Text="{Binding RepoName, FallbackValue=IDE}"/>
-          </StackPanel>
+        <!-- Title -->
+        <TextBlock Classes="h1" Text="GitHub" VerticalAlignment="Center"/>
 
-          <!-- divider -->
-          <Border Grid.Column="1" Background="#2a2a2a"/>
+        <!-- Login -->
+        <Button Grid.Column="2" Classes="flat" Content="Login" HorizontalAlignment="Left"/>
 
-          <!-- Branch -->
-          <StackPanel Grid.Column="2" Spacing="2" Margin="12,0,0,0">
-            <TextBlock Classes="muted" Text="Current branch"/>
-            <TextBlock Classes="h1" Text="{Binding BranchName, FallbackValue=main}"/>
-          </StackPanel>
+        <!-- Repo -->
+        <StackPanel Grid.Column="4" Spacing="2">
+          <TextBlock Classes="muted" Text="Current Repo"/>
+          <TextBlock Classes="h2" Text="(none)"/>
+        </StackPanel>
 
-          <!-- divider -->
-          <Border Grid.Column="3" Background="#2a2a2a"/>
+        <!-- Branch -->
+        <StackPanel Grid.Column="6" Spacing="2">
+          <TextBlock Classes="muted" Text="Current Branch"/>
+          <TextBlock Classes="h2" Text="(none)"/>
+        </StackPanel>
 
-          <!-- Actions -->
-          <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="8">
-            <Button Classes="action"
-                    Content="Fetch origin"
-                    Command="{Binding FetchCommand}"/>
-            <TextBlock Classes="muted"
-                       VerticalAlignment="Center"
-                       Text="{Binding LastFetchText, FallbackValue=Last fetched just now}"/>
-          </StackPanel>
+        <!-- Fetch -->
+        <Button Grid.Column="8" Classes="flat" Content="Fetch Origin" HorizontalAlignment="Right"/>
 
+      </Grid>
+    </Border>
+
+    <!-- ========================= -->
+    <!-- CONTENT (Row 1)           -->
+    <!-- 3 areas: left / mid / right -->
+    <!-- ========================= -->
+    <Grid Grid.Row="1"
+          ColumnDefinitions="260,1,360,1,*"
+          RowDefinitions="Auto,1,*">
+
+      <!-- Left: Tabs (Changes/History) -->
+      <Border Grid.Row="0" Grid.Column="0" Classes="pane" Padding="12,10">
+        <Grid ColumnDefinitions="*,*" >
+          <Button Grid.Column="0" Classes="tab" Content="Changes"/>
+          <Button Grid.Column="1" Classes="tab" Content="History"/>
         </Grid>
       </Border>
 
-      <!-- MAIN: 3 columns -->
-      <Grid Grid.Row="1" ColumnDefinitions="320,1,360,1,*">
-
-        <!-- LEFT: History / Changes list -->
-        <Grid Grid.Column="0" RowDefinitions="Auto,1,*">
-
-          <!-- Tabs -->
-          <Border Grid.Row="0" Classes="strip" BorderThickness="0,0,0,1" Padding="12,10">
-            <Grid ColumnDefinitions="Auto,Auto,*">
-              <Button Classes="tab"
-                      Content="Changes"
-                      IsEnabled="True"
-                      />
-              <Button Grid.Column="1"
-                      Classes="tab"
-                      Content="History"
-                      Margin="0,0,0,0"/>
-            </Grid>
-          </Border>
-
-          <Border Grid.Row="1" Background="#2a2a2a"/>
-
-          <!-- List -->
-          <ScrollViewer Grid.Row="2">
-            <StackPanel>
-              <!-- Placeholder rows (später ItemsControl/ListBox) -->
-              <Border Classes="row">
-                <StackPanel Spacing="2">
-                  <TextBlock Classes="h2" Text="kisystem"/>
-                  <TextBlock Classes="muted" Text="Priogeth • 15 hours ago"/>
-                </StackPanel>
-              </Border>
-
-              <Border Classes="row">
-                <StackPanel Spacing="2">
-                  <TextBlock Classes="h2" Text="Engines/Github up"/>
-                  <TextBlock Classes="muted" Text="Priogeth • 16 hours ago"/>
-                </StackPanel>
-              </Border>
-
-              <Border Classes="row">
-                <StackPanel Spacing="2">
-                  <TextBlock Classes="h2" Text="explorer is up"/>
-                  <TextBlock Classes="muted" Text="Priogeth • 17 hours ago"/>
-                </StackPanel>
-              </Border>
-
-              <Border Classes="row">
-                <TextBlock Classes="muted" Text="(history list placeholder)"/>
-              </Border>
-
-            </StackPanel>
-          </ScrollViewer>
-
+      <!-- Mid: header -->
+      <Border Grid.Row="0" Grid.Column="2" Classes="pane">
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock Classes="h2" Text="Changed files" VerticalAlignment="Center"/>
+          <TextBlock Grid.Column="1" Classes="muted" Text="(0)" VerticalAlignment="Center"/>
         </Grid>
+      </Border>
 
-        <!-- divider -->
-        <Border Grid.Column="1" Background="#2a2a2a"/>
-
-        <!-- MIDDLE: Changed files -->
-        <Grid Grid.Column="2" RowDefinitions="Auto,1,*">
-
-          <Border Grid.Row="0" Classes="strip">
-            <Grid ColumnDefinitions="*,Auto">
-              <TextBlock Classes="h1" Text="Changed files"/>
-              <TextBlock Grid.Column="1"
-                         Classes="muted"
-                         VerticalAlignment="Center"
-                         Text="{Binding ChangedFilesCount, FallbackValue=4 changed files}"/>
-            </Grid>
-          </Border>
-
-          <Border Grid.Row="1" Background="#2a2a2a"/>
-
-          <ScrollViewer Grid.Row="2">
-            <StackPanel>
-              <Border Classes="row">
-                <TextBlock Classes="mono" Text="GatewayIDE.App\GatewayIDE.App.csproj"/>
-              </Border>
-              <Border Classes="row">
-                <TextBlock Classes="mono" Text="GatewayIDE.App\Views\Layout.axaml"/>
-              </Border>
-              <Border Classes="row">
-                <TextBlock Classes="mono" Text="Textdokument (neu).txt"/>
-              </Border>
-              <Border Classes="row">
-                <TextBlock Classes="mono" Text="build-win.bat"/>
-              </Border>
-            </StackPanel>
-          </ScrollViewer>
-
+      <!-- Right: header -->
+      <Border Grid.Row="0" Grid.Column="4" Classes="pane">
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock Classes="h2" Text="Preview" VerticalAlignment="Center"/>
+          <Button Grid.Column="1" Classes="flat" Content="⚙" Width="38" Padding="0"/>
         </Grid>
+      </Border>
 
-        <!-- divider -->
-        <Border Grid.Column="3" Background="#2a2a2a"/>
+      <!-- Divider row under headers -->
+      <Border Grid.Row="1" Grid.ColumnSpan="5" Classes="div"/>
 
-        <!-- RIGHT: Diff / Preview -->
-        <Grid Grid.Column="4" RowDefinitions="Auto,1,*">
+      <!-- Left: list placeholder -->
+      <Border Grid.Row="2" Grid.Column="0" Classes="pane">
+        <TextBlock Classes="muted" Text="(commits / changes list placeholder)"/>
+      </Border>
 
-          <Border Grid.Row="0" Classes="strip">
-            <Grid ColumnDefinitions="*,Auto">
-              <TextBlock Classes="h1" Text="GatewayIDE.App\GatewayIDE.App.csproj"/>
-              <Button Grid.Column="1"
-                      Classes="action"
-                      Content="⚙"
-                      Width="38"
-                      HorizontalContentAlignment="Center"/>
-            </Grid>
-          </Border>
+      <!-- Vertical dividers -->
+      <Border Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" Classes="div"/>
+      <Border Grid.Row="0" Grid.RowSpan="3" Grid.Column="3" Classes="div"/>
 
-          <Border Grid.Row="1" Background="#2a2a2a"/>
+      <!-- Mid: files placeholder -->
+      <Border Grid.Row="2" Grid.Column="2" Classes="pane">
+        <TextBlock Classes="muted" Text="(changed files list placeholder)"/>
+      </Border>
 
-          <ScrollViewer Grid.Row="2">
-            <Border Padding="12">
-              <TextBlock Classes="mono" Text="(diff / preview placeholder)"/>
-            </Border>
-          </ScrollViewer>
-
-        </Grid>
-
-      </Grid>
-
-      <!-- STATUSBAR -->
-      <Border Grid.Row="2"
-              Background="#111"
-              BorderBrush="#222"
-              BorderThickness="1,1,0,0"
-              Padding="8">
-        <TextBlock Text="Status: isolation" Foreground="#aaaaaa"/>
+      <!-- Right: diff/preview placeholder -->
+      <Border Grid.Row="2" Grid.Column="4" Classes="pane">
+        <TextBlock Classes="muted" Text="(diff / preview placeholder)"/>
       </Border>
 
     </Grid>
-  </Border>
 
+    <!-- ========================= -->
+    <!-- FOOTER (Row 2) optional   -->
+    <!-- ========================= -->
+    <Border Grid.Row="2"
+            Background="#0f0f0f"
+            BorderBrush="#2a2a2a"
+            BorderThickness="0,1,0,0"
+            Padding="12,8">
+      <TextBlock Classes="muted" Text=""/>
+    </Border>
+
+  </Grid>
 </UserControl>
