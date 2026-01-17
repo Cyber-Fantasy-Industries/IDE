@@ -1,7 +1,7 @@
 # .gitignore
 # Binaries
 out/
-*.exe
+
 *.dll
 *.so
 *.dylib
